@@ -1,6 +1,6 @@
 """
 Authored by Kim Clarence Penaflor
-06/27/2019
+07/30/2019
 version 0.0.1
 Documented via reST
 """

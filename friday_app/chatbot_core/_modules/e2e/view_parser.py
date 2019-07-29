@@ -10,14 +10,23 @@ Parse user view from component spiels
 import re
 import json
 from friday_app.chatbot_core._components import spiel
-
-# TODO convo_data module
 from friday_app.chatbot_core._components import convo_data
-
-# TODO config module
 from friday_app.shared.configration import config
 
+global VIEW_DIR
+VIEW_DIR = 'friday_app/chatbot_core/_components/view/'
 
+
+# Get view json
+def get_view(sessionName):
+  global VIEW_DIR
+  viewFile = open(VIEW_DIR+sessionName+'.json').read()
+  return json.loads(viewFile)
+
+# Execute view parser and unit output
+# TODO View Parser Exe
+def exe(userID, sessionName, userInput):
+  pass
 
 
 

@@ -5,12 +5,9 @@ version 0.0.1
 Documented via reST
 Holds Chatbot-User conversation data
 """
-
-# TODO config module
 from friday_app.shared.configration import config
 from friday_app.utility.aws_services.dynamodb import Dynamodb
 
-# TODO Initialize Dynamodb Table by Config Environment
 global DYNAMODB
 DYNAMODB = Dynamodb(
   config.var('DYNAMODB_USER_SESSION_TABLE')

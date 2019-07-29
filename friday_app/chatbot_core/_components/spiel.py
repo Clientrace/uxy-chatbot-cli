@@ -7,7 +7,6 @@ Documented via reST
 Load and generate chatbot spiels
 """
 
-
 import re
 import json
 
@@ -19,6 +18,14 @@ DISPLAY_DIR = 'friday_app/chatbot_core/_components/content/'
 # Load Display Json
 def load_display(userID):
   global DISPLAY_DIR
+  """
+  Load Display Json
+  :param userID: Facebook User ID
+  :type userID: string
+  :returns: display json object
+  :rtype: json (dictionary)
+  """
+
   display = json.loads(open(DISPLAY_DIR+'displays.json').read())
   return display
 
@@ -64,8 +71,46 @@ def display_attachment(url, ftype):
   }]
 
 
+# Free text
+def free_text(text, delay):
+  """ 
+  Generate free text return blueprint
+
+  :type text: string
+  :param text: text message to send
+
+  :type delay: integer
+  :param delay: message sending action delay
+
+  :returns: Json response blueprint
+  :rtype: Json array
+  """
+  return [{
+    'type' : 'text',
+    'data' : text,
+    'options' : [],
+    'prefix' : '',
+    'delay' : delay
+  }]
+
+
 # Quick Reply Response
 def quick_reply(userID, displayID, options):
+  """
+  Generate FB quick response blueprint
+
+  :type userID: string
+  :param userID: Facebook User ID
+
+  :type displayID: string
+  :param displayID: json display ID
+
+  :type options: Json (dictionary) array
+  :param options: Quick Reply Buttons
+
+  :returns: Json response blueprint
+  :rtype: Json (dictionary) array
+  """
   display = get_display(userID, displayID)
   buttons = []
   for option in options:
@@ -84,6 +129,17 @@ def quick_reply(userID, displayID, options):
 
 # Generic Button Template Response
 def btn_menu(text, options):
+  """ 
+  Generate FB Button Template response blueprint
+  :type text: string
+  :param text: Button menu header
+
+  :type options: Json (dictionary) array
+  :param options: array of options
+
+  :returns: Json response blueprint
+  :rtype: Json array
+  """
   return [{
     'type' : 'btn',
     'data' : text,

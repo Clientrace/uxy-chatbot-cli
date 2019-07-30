@@ -9,19 +9,17 @@ Load and generate chatbot spiels
 
 import re
 import json
+import random
 
 global DISPLAY_DIR
-
 DISPLAY_DIR = 'friday_app/chatbot_core/_components/content/'
 
 
 # Load Display Json
-def load_display(userID):
+def load_display():
   global DISPLAY_DIR
   """
   Load Display Json
-  :param userID: Facebook User ID
-  :type userID: string
   :returns: display json object
   :rtype: json (dictionary)
   """
@@ -32,7 +30,9 @@ def load_display(userID):
 
 # Get Display Spiel
 def get_display(userID, displayID):
-  displays = load_display(userID)
+  displays = load_display()
+  if( type(displays[displayID]['data']) == list ):
+    displays[displayID]['data'] = random.choice(displays[displayID]['data'])
   return displays[displayID]
 
 

@@ -10,7 +10,7 @@ import re
 import json
 from friday_app.chatbot_core._components import spiel
 from friday_app.chatbot_core._components import convo_data
-from friday_app.shared.configration import config
+from friday_app.shared.configuration import config
 
 global VIEW_DIR
 VIEW_DIR = 'friday_app/chatbot_core/_components/view/'
@@ -31,11 +31,11 @@ def exe(userID, sessionName, userInput):
   maxRetry = False
 
   responses = []
-  altResponses = []
+  altResponse = []
 
   view = get_view(sessionName)
 
-  altDisplay = spiel.get_display(userID, ".option-notmatch")
+  altDisplay = spiel.get_display(userID, "FS-01")
   if( len(view['opions']) == 0 and len(view['content']) > 0 ):
     displayID = view['content'][-1]
     display = spiel.get_display(userID, displayID)
@@ -48,8 +48,7 @@ def exe(userID, sessionName, userInput):
     }]
 
   else:
-    #TODO default spiels file json
-    altResponse = spiel.text(userID, ".fallback")
+    altResponse = spiel.text(userID, "FS-00")
     altResponse += [{
       'type' : view['optionType'],
       'data' : altDisplay['data'],
@@ -167,3 +166,4 @@ def exe(userID, sessionName, userInput):
 
   return responses, altResponse, choices, matchedOption, inputValid, maxRetry
   
+

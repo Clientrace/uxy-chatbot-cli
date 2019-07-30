@@ -5,7 +5,7 @@ version 0.0.1
 Documented via reST
 Holds Chatbot-User conversation data
 """
-from friday_app.shared.configration import config
+from friday_app.shared.configuration import config
 from friday_app.utility.aws_services.dynamodb import Dynamodb
 
 global DYNAMODB
@@ -60,7 +60,6 @@ def increment(userID, attribute):
   data = DYNAMODB.increment(itemKey, attribute)
   return data['Attribute'][attribute]['N']
 
-
 # Reset DB Item attrib
 def reset(userID, attribute):
   global DYNAMODB
@@ -77,5 +76,4 @@ def reset(userID, attribute):
 
   data = DYNAMODB.update_item(itemKey, item)
   return data
-
 

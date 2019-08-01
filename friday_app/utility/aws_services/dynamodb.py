@@ -1,6 +1,12 @@
 """
-07/11/2019
+Authored by Kim Clarence Penaflor
+08/01/2019
+version 0.0.1
+Documented via reST
+
+AWS Dynamodb Controller
 """
+
 
 import boto3
 
@@ -161,5 +167,3 @@ class Dynamodb:
 
 
    
-
-    

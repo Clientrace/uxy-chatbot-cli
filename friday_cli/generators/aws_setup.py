@@ -8,6 +8,7 @@ AWS Development Environment Setup
 """
 
 
+import os
 import boto3
 import uuid
 import json
@@ -24,7 +25,7 @@ class AWSSetup:
   def __init__(self, appName, config):
     """
     Initialize Chatbot App name and configurations
-    :param appName: applicatiton name
+    :param appName: application name
     :type appname: string
     :param config: application configuration
     :type config: dictionary
@@ -34,6 +35,7 @@ class AWSSetup:
     config blueprint:
     {
       'app' : <app-name>,
+      'runtime' : 'python3.6',
       'stage' : <environment stage>,
       'environments' : {
         'production' : {
@@ -53,8 +55,11 @@ class AWSSetup:
         'dynamodb:auth-table' : {
           'wcu' : 5,
           'rcu' : 5
-        }
+        },
+        'lambda:handler' : 'index.lambda_handler',
+        'lambda:timeout' : 900
       },
+
       'verbosity' : false 
     }
     """
@@ -96,7 +101,7 @@ class AWSSetup:
     :param config: app configuration
     :param type
     """
-    sessionTableName = appName+'friday-session-'+config['stage']
+    sessionTableName = appName+'-friday-session-'+config['stage']
     dynamodb.create_table(
       AttributeDefinitions = [{
         'AttributeName' : 'userID',
@@ -118,18 +123,18 @@ class AWSSetup:
     """
     Generate IAM Role for chatbot AWS Resources
     :param _iamClient: boto3 iam client instance
-    :type _iamClient: boto3 class
+    :type _iamClient: boto3 object
     :param _iamRes: boto3 iam resource instance
-    :type _iamRes: boto3 class
+    :type _iamRes: boto3 object
     :param appName: application name
     :type appname: string
-    :param config: app config
+    :param config: application configuration
     :type config: dictionary
     :returns: Role ARN
     :rtype: dictionary
     """
 
-    roleName = appName+'friday-app'
+    roleName = appName+'-friday-app'
     try:
       _iamClient.create_role(
         RoleName = roleName,
@@ -146,7 +151,7 @@ class AWSSetup:
       )
       apiRole = _iamRes.Role(roleName)
       for role in config['iamRoles']:
-        AWSSetup._log('+ Attaching Role: '+role+'.')
+        AWSSetup._log('+ Attaching Role: '+role+'...')
         apiRole.attach_policy(
           PolicyArn = role
         )
@@ -164,18 +169,53 @@ class AWSSetup:
 
 
   @staticmethod
-  # TODO AWS Lambda generator (zipper)
-  def _create_function(appName, _lambda, roleARN, config):
-    zipFileName = 'frApp.zip'
-    with zipFile.ZipFile(zipFileName, 'a') as file:
-      pass
+  def _create_function(appName, _lambda, roleARN, ziph, config):
+    """
+    Creates AWS lambda function and uploads app template
+    :param appName: application name
+    :type appName: string
+    :param _lambda: boto3 lambda client instance
+    :type _lambda: boto3 object
+    :param roleARN: IAM Role
+    :type roleARN: string
+    :param ziph: python zipper
+    :type ziph: zipfile instance
+    :param config: application configuration
+    """
+
+    AWSSetup._log('+ Compressing Template...')
+    funcName = appName+'-friday-app'
+    path = 'friday_cli/friday_template/'
+    for root, dirs, files in os.walk(path):
+      for file in files:
+        ziph.write(os.path.join(root, file))
+
+    AWSSetup._log('+ Loading app package...')
+    zipFile = open('fr.zip','rb').read()
+
+    AWSSetup._log('+ Creating lambda function...')
+    _lambda.create_function(
+      FunctionName = funcName,
+      Runtime = config['runtime'],
+      Role = roleARN,
+      Handler = config['aws:config']['handler'],
+      Code = {
+        'ZipFile' : zipFile
+      },
+      Timeout = config['aws:config']['lambda:timeout']
+    )
+
+  @staticmethod
+  # TODO: API Gateway Generator
+  def _generate_api_gateway(appName, _apiGateway, config):
+    pass
 
 
   def setup(self):
-    AWSSetup._create_function(self.appName,'test','test',self.config)
 
-
-
+    zipf = zipfile.ZipFile('fri.zip', 'w', zipfile.ZIP_DEFLATED)
+    AWSSetup._create_function(self.appName,'test','test', zipf, self.config)
+    zipf.close()
 
 
 

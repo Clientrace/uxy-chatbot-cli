@@ -1,4 +1,7 @@
 # Distribution / packaging
+__pycache__/
+.vscode/
+venv/
 .Python
 *.pyc
 env/

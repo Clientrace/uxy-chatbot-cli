@@ -1,0 +1,9 @@
+{
+  "app" : "app-name",
+  "stage" : "dev",
+  "envConfig" : {
+    "" : ""
+  }
+}
+
+

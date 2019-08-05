@@ -15,6 +15,7 @@ from friday_app.chatbot_core._modules.e2e import input_parser
 from friday_app.chatbot_core._modules.e2e import view_parser
 from friday_app.chatbot_core._components import convo_data
 from friday_app.chatbot_core._components import spiel
+from friday_app.chatbot_core._components import persist
 
 
 global DYNAMODB
@@ -146,34 +147,38 @@ def route(userID, sessionName, data=None):
   return responses
 
 
-# Check if user agreed on dpa
-def check_dpa(userID):
-  ret = convo_data.get_item(userID, 'dpa')
-  return ret == 'yes'
-
-
 # Execute Route
 def exe(userID, source, inputData, intentName):
   cur_session = None
   inputData = input_parser.exe(inputData)
 
-  if( inputData['type'] == 'payload' ):
-    if( 'FACEBOOK_WELCOME' in inputData['data']['payload'] ):
+  try:
+    if( inputData['type'] == 'payload' ):
+      if( 'PERSIST' in inputData['data']['payload'] ):
+        prev_session,err = get_route(userID)
+        if( prev_session not in persist.STATE_EXCEPTIONS ):
+          cur_session = persist.ROUTES[inputData['data']['payload']]
+          return route(userID, cur_session)
+
+      if( 'FACEBOOK_WELCOME' in inputData['data']['payload'] ):
+        cur_session = 'welcome'
+        init_session(userID, 'facebook')
+
+    if( intentName == 'Default Welcome Intent' ):
       cur_session = 'welcome'
-      init_session(userID, 'facebook')
+      if( not user_exists(userID) ):
+        init_session(userID, source)
 
-  if( intentName == 'Default Welcome Intent' ):
-    cur_session = 'welcome'
-    if( not user_exists(userID) ):
-      init_session(userID, source)
-
-  else:
-    cur_session, errors = get_route(userID)
-    inputData['errors'] = int(errors)
+    else:
+      cur_session, errors = get_route(userID)
+      inputData['errors'] = int(errors)
+  except Exception as e:
+    if( hasattr(e, 'message') ):
+      print('[ROUTE ERROR]: '+str(e.message))
+    else:
+      print('[ROUTE ERROR]: '+str(e))
+    cur_session = 'error_fallback'
 
   return route(userID, cur_session, inputData)
-
-
-
 
 

@@ -34,7 +34,7 @@ def exe(userID, sessionName, userInput):
 
   view = get_view(sessionName)
 
-  altDisplay = spiel.get_display(userID, "FS-01")
+  altDisplay = spiel.get_display(userID, "ERR-02")
   if( len(view['opions']) == 0 and len(view['content']) > 0 ):
     displayID = view['content'][-1]
     display = spiel.get_display(userID, displayID)
@@ -47,7 +47,7 @@ def exe(userID, sessionName, userInput):
     }]
 
   else:
-    altResponse = spiel.text(userID, "FS-00")
+    altResponse = spiel.text(userID, "ERR-01")
     altResponse += [{
       'type' : view['optionType'],
       'data' : altDisplay['data'],

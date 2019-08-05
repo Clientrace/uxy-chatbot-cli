@@ -11,7 +11,10 @@ AWS Development Environment Setup
 import boto3
 import uuid
 import json
+<<<<<<< HEAD
 import zipfile
+=======
+>>>>>>> 7e8c965d2eff70189c26763edca3e44b33c835dd
 
 
 class AWSSetup:
@@ -19,12 +22,16 @@ class AWSSetup:
   AWS Setup Manager
   """
 
+<<<<<<< HEAD
   verbosity = False
 
+=======
+>>>>>>> 7e8c965d2eff70189c26763edca3e44b33c835dd
   def __init__(self, appName, config):
     """
     Initialize Chatbot App name and configurations
     :param appName: applicatiton name
+<<<<<<< HEAD
     :type appname: string
     :param config: application configuration
     :type config: dictionary
@@ -57,12 +64,18 @@ class AWSSetup:
       },
       'verbosity' : false 
     }
+=======
+    :param type: string
+    :param config: application configuration
+    :param type: dictionary
+>>>>>>> 7e8c965d2eff70189c26763edca3e44b33c835dd
     """
 
     self.appName = appName
     self.config = config
 
     # Initialize AWS Resources
+<<<<<<< HEAD
     self._dynamodb = boto3.resource('dynamodb')
     self._s3 = boto3.resource('s3')
     self._IAMRes = boto3.resource('iam')
@@ -77,6 +90,20 @@ class AWSSetup:
     :type msg: string
     """
     if( cls.verbosity ):
+=======
+    self._dynamodb = botto3.resource('dynamodb')
+    self._s3 = boto3.resource('s3')
+    self._IAMRes = boto3.resource('iam')
+    self._IAMClient = boto3.client('iam')
+
+  def _log(self, msg):
+    """
+    Log System Process
+    :param string: string msg to log
+    :param type: string
+    """
+    if( self.verbosity ):
+>>>>>>> 7e8c965d2eff70189c26763edca3e44b33c835dd
       print(msg)
 
   # TODO: save app config to s3 bucket
@@ -85,6 +112,7 @@ class AWSSetup:
     pass
 
 
+<<<<<<< HEAD
   @staticmethod
   def _init_table(appName, dynamodb, config):
     """
@@ -125,13 +153,36 @@ class AWSSetup:
     :type appname: string
     :param config: app config
     :type config: dictionary
+=======
+  # TODO: Dynamobd Init
+  @staticmethod
+  def _init_table(self):
+    pass
+
+  @staticmethod
+  def _generate_iam_role(iamClient, iamRes, appName, config):
+    """
+    Generate IAM Role for chatbot AWS Resources
+    :param iamClient: boto3 iam client instance
+    :param type: boto3 class
+    :param iamRes: boto3 iam resource instance
+    :param type: boto3 class
+    :param appName: application name
+    :param type: string
+    :param config: app config
+    :param type: dictionary
+>>>>>>> 7e8c965d2eff70189c26763edca3e44b33c835dd
     :returns: Role ARN
     :rtype: dictionary
     """
 
     roleName = appName+'friday-app'
     try:
+<<<<<<< HEAD
       _iamClient.create_role(
+=======
+      iamClient.create_role(
+>>>>>>> 7e8c965d2eff70189c26763edca3e44b33c835dd
         RoleName = roleName,
         AssumeRolePolicyDocument = json.dumps({
           'Version' : '2012-10-17',
@@ -144,14 +195,21 @@ class AWSSetup:
           }]
         })
       )
+<<<<<<< HEAD
       apiRole = _iamRes.Role(roleName)
       for role in config['iamRoles']:
         AWSSetup._log('+ Attaching Role: '+role+'.')
+=======
+      apiRole = iamRes.Role(roleName)
+      for role in config['iamRoles']:
+        self._log('+ Attaching Role: '+role+'.')
+>>>>>>> 7e8c965d2eff70189c26763edca3e44b33c835dd
         apiRole.attach_policy(
           PolicyArn = role
         )
       
       apiRole.reload()
+<<<<<<< HEAD
       AWSSetup._log('==> Role Created.')
     except Exception as e:
       if( '(EntityAlreadyExists)' in str(e) ):
@@ -174,6 +232,26 @@ class AWSSetup:
     AWSSetup._create_function(self.appName,'test','test',self.config)
 
 
+=======
+      self._log('==> Role Created.')
+    except Exception as e:
+      if( '(EntityAlreadyExists)' in str(e) ):
+        apiRole = iamRes.Role(roleName)
+        roleArn = apiRole.arn
+        self._log('==> Role Created.')
+
+    self._log('Role ARN: '+str(roleArn))
+    return roleArn
+
+
+    
+
+
+
+
+
+  
+>>>>>>> 7e8c965d2eff70189c26763edca3e44b33c835dd
 
 
 

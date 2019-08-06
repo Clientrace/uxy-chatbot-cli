@@ -280,16 +280,49 @@ class AWSSetup:
     return response
 
 
+  @staticmethod
+  def _get_apigateway_rootId(restApiId, _apiGateway):
+    """
+    Get API Gateway Rest API Root [/] ID
+    :param restApiId: AWS API Gateway Rest API ID
+    :type restApiId: string
+    :param _apiGateway: API Gateway instance
+    :type _apiGateway: boto3 object
+    :returns: rest api root id
+    :rtype: string
+    """
+
+    response = _apiGateway.get_resources(
+      restApiId = restApiId,
+      embed = ['/']
+    )
+    return response['items'][0]['id']
+
+
   #TODO: Generate api gateway resource
   @staticmethod
-  def _generate_api_gateway_resource(resourceName):
+  def _generate_apigateway_resource(restApiId, pathPart, _apiGateway):
     """
     """
-    return
+    rootResourceId = AWSSetup._get_apigateway_rootId(restApiId, _apiGateway)
+    response = _apiGateway.create_resource(
+      restApiId = restApiId,
+      parentId = rootResourceId,
+      pathPart = pathPart
+    )
+    return response
 
   @staticmethod
-  # TODO: API Gateway Generator
-  def _generate_api_gateway(appName, _apiGateway, config):
+  def _generate_apigateway_rest_api(appName, _apiGateway, config):
+    """
+    Create AWS API Gateway Rest API
+    :param appName: application name
+    :type appName: string
+    :param _apiGateway: api gateway instance
+    :type _apiGateway: boto3 object
+    :returns: aws response
+    :rtype: dictionary
+    """
     apiName = appName+'-friday-app-'+config['stage']
     response = _apiGateway.create_rest_api(
       name = apiName,
@@ -302,6 +335,13 @@ class AWSSetup:
       }
     )
     return response
+
+
+  @staticmethod
+  # TODO: API Gateway Generator
+  def _generate_friday_api(appName, _apiGateway, config):
+    pass
+
 
   def remove_iamrole(self, roleName):
     """
@@ -356,15 +396,21 @@ class AWSSetup:
     response = AWSSetup._generate_lambda(self.appName, self._lambda, roleARN, self.config)
     return response
 
-  def setup_api_gateway(self):
+  def create_apigateway_res(self, restApiId, pathPart):
     """
     Setup AWS API Gateway endpoints
     """
-    response = AWSSetup._generate_api_gateway(self.appName, self._apiGateway, self.config)
+    response = AWSSetup._generate_apigateway_resource(restApiId, pathPart, self._apiGateway)
+    return response
+
+  def create_apigateway_rest_api(self):
+    """
+    """
+    response = AWSSetup._generate_apigateway_rest_api(self.appName, self._apiGateway, self.config)
     return response
 
 
-  def delete_api_gateway_rest(self, restApiId):
+  def delete_apigateway_rest(self, restApiId):
     """
     Get AWS API Gateway Rest API
     :param restApiId: rest api id
@@ -379,6 +425,5 @@ class AWSSetup:
       restApiId = restApiId
     )
     return response
-
 
 

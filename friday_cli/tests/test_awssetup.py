@@ -100,20 +100,29 @@ class AWSSetupTest(unittest.TestCase):
     awsSetup.remove_iamrole('testbot-friday-app')
     awsSetup.remove_lambda('testbot-friday-app')
 
-  def test_api_gateway_generator(self):
+
+  @unittest.skip('Temporary Skip..')
+  def test_apigateway_create_rest(self):
     """
-    Test API Gateway Generator
+    Test API Gateway Rest API Generator
     """
 
     awsSetup = AWSSetup(self.appConfig)
-    response = awsSetup.setup_api_gateway()
+    response = awsSetup.create_apigateway_rest_api()
     self.assertTrue(
       response['ResponseMetadata']['HTTPStatusCode'], 201
     )
-
     apiRestId = response['id']
-    awsSetup.delete_api_gateway_rest(apiRestId)
+    awsSetup.delete_apigateway_rest(apiRestId)
 
+  def test_apigateway_resource_generator(self):
+    """
+    Test API Gateway Rest Resource Generator
+    """
+
+    awsSetup = AWSSetup(self.appConfig)
+    response = awsSetup.create_apigateway_res('2hvp05014h','test')
+    print(response)
 
 if __name__ == '__main__':
   unittest.main()

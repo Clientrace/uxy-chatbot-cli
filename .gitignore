@@ -20,5 +20,8 @@ var/
 .installed.cfg
 *.egg
 
+# Friday Generated Files
+fri.zip
+
 # Serverless directories
 .serverless

@@ -115,17 +115,20 @@ class AWSSetupTest(unittest.TestCase):
     apiRestId = response['id']
     awsSetup.delete_apigateway_rest(apiRestId)
 
-  def test_apigateway_resource_generator(self):
+  def test_apigateway_addmethod(self):
     """
-    Test API Gateway Rest Resource Generator
+    Test API Gateway add method
     """
-
     awsSetup = AWSSetup(self.appConfig)
-    response = awsSetup.create_apigateway_res('2hvp05014h','test')
+    response = awsSetup.get_lambda('webview-auth')
     print(response)
+    # lambdaARN = 'arn:aws:lambda:ap-southeast-1:940508673835:function:webview-auth'
+    # response = awsSetup.apigateway_addwebhook('2hvp05014h','4uf18c','POST',lambdaARN)
+    # print(response)
+
+    
 
 if __name__ == '__main__':
   unittest.main()
-
 
 

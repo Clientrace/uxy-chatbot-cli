@@ -208,6 +208,22 @@ class AWSSetup:
 
 
   @staticmethod
+  def _get_lambda_function(funcName, _lambda):
+    """
+    Check if lambda function exist
+    :param funcName: lambda function resource name
+    :type funcName: string
+    :param _lambda: aws lambda client controller
+    :type _lambda: boto3 client object
+    :returns: aws response
+    :rtype: dictionary
+    """
+    result = _lambda.get_function(
+      FunctionName = funcName
+    )
+    return result
+
+  @staticmethod
   def _function_exists(funcName, _lambda):
     """
     Check if lambda function exist
@@ -220,9 +236,7 @@ class AWSSetup:
     """
 
     try:
-      _lambda.get_function(
-        FunctionName = funcName
-      )
+      AWSSetup._get_lambda_function(funcName, _lambda)
       return AWSSetup.FUNCTION_FOUND
     except Exception as e:
       if( '(ResourceNotFoundException)' in str(e) ):
@@ -303,6 +317,14 @@ class AWSSetup:
   @staticmethod
   def _generate_apigateway_resource(restApiId, pathPart, _apiGateway):
     """
+    Create AWS API Gateway Rest Resource
+    :param restApiId: AWS API Gateway Rest API ID
+    :type restApiId: string
+    :param pathPart: rest path
+    :param _apiGateway: API Gateway instance
+    :type _apiGateway: boto3 object
+    :returns: rest api root id
+    :rtype: string
     """
     rootResourceId = AWSSetup._get_apigateway_rootId(restApiId, _apiGateway)
     response = _apiGateway.create_resource(
@@ -311,6 +333,7 @@ class AWSSetup:
       pathPart = pathPart
     )
     return response
+
 
   @staticmethod
   def _generate_apigateway_rest_api(appName, _apiGateway, config):
@@ -336,11 +359,43 @@ class AWSSetup:
     )
     return response
 
+  @staticmethod
+  def _add_friday_webhook_method(restApiId, resourceId, httpMethod, lambdaARN, _apiGateway, config):
+    """
+    """
+    response = _apiGateway.put_integration(
+      restApiId = restApiId,
+      resourceId = resourceId,
+      httpMethod = httpMethod,
+      type = 'AWS',
+      integrationHttpMethod = 'POST',
+      uri = 'arn:aws:apigateway:'+config['region']+':lambda:'+lambdaARN
+    )
+    return response
+
+  def apigateway_addwebhook(self, restApiId, resourceId, httpMethod, lambdaARN):
+    # response = AWSSetup._add_friday_webhook_method(restApiId, resourceId, httpMethod, lambdaARN, self._apiGateway)
+    # return response
+    pass
+
 
   @staticmethod
   # TODO: API Gateway Generator
   def _generate_friday_api(appName, _apiGateway, config):
-    pass
+    AWSSetup._log('+ Generating Rest API...')
+    response = AWSSetup._generate_apigateway_rest_api(appName, _apiGateway, config)
+    restApiId = response['id']
+
+    response = AWSSetup._generate_apigateway_resource(restApiId, 'friday-webhook', _apiGateway)
+    webhookResourceId = response['id']
+
+
+    response = _apiGateway.update_method(
+      restApiId = restApiId,
+      resourceId = webhookResourceId,
+      httpMethod = 'GET'
+    )
+
 
 
   def remove_iamrole(self, roleName):
@@ -384,6 +439,12 @@ class AWSSetup:
     except Exception as e:
       response = {}
 
+    return response
+
+  def get_lambda(self, funcName):
+    """
+    """
+    response = AWSSetup._get_lambda_function(funcName, self._lambda)
     return response
 
   def package_lambda(self, roleARN):

@@ -19,11 +19,13 @@ class AWSSetupTest(unittest.TestCase):
   # Test Application Configuration
   appConfig = {
     'app:name' : 'testbot',
-    'app:version' : 1,
+    'app:version' : '1',
+    'app:description' : 'test description',
     'description' : 'test chatbot',
     'runtime' : 'python3.6',
     'stage' : 'dev',
     'aws:config' : {
+      'region' : 'ap-southeast-1',
       'dynamodb:session-table' : {
         'wcu' : 5,
         'rcu' : 5
@@ -73,6 +75,7 @@ class AWSSetupTest(unittest.TestCase):
     os.remove(appPackageDest)
 
 
+  @unittest.skip('Temporary Skip..')
   def test_lambda_generator(self):
     """
     Test lambda generator (Function Create)
@@ -97,10 +100,18 @@ class AWSSetupTest(unittest.TestCase):
     awsSetup.remove_iamrole('testbot-friday-app')
     awsSetup.remove_lambda('testbot-friday-app')
 
+  def test_api_gateway_generator(self):
+    """
+    Test API Gateway Generator
+    """
+
+    awsSetup = AWSSetup(self.appConfig)
+    response = awsSetup.setup_api_gateway()
+    print(response)
+
 
 if __name__ == '__main__':
   unittest.main()
-
 
 
 

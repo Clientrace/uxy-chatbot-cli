@@ -68,13 +68,27 @@ class AWSSetup:
     self.appName = config['app:name']
 
     # Initialize AWS Resources
-    self._s3 = boto3.resource('s3')
-    self._iamRes = boto3.resource('iam')
-    self._iamClient = boto3.client('iam')
-    self._lambda = boto3.client('lambda')
-    self._dynamodb = boto3.resource('dynamodb')
-    self._apiGateway = boto3.client('apigateway')
+    self._s3 = boto3.resource('s3',
+     region_name=config['aws:config']['region'])
+    self._iamRes = boto3.resource('iam',
+     region_name=config['aws:config']['region'])
+    self._iamClient = boto3.client('iam',
+     region_name=config['aws:config']['region'])
+    self._lambda = boto3.client('lambda',
+     region_name=config['aws:config']['region'])
+    self._dynamodb = boto3.resource('dynamodb',
+     region_name=config['aws:config']['region'])
+    self._apiGateway = boto3.client('apigateway',
+     region_name=config['aws:config']['region'])
 
+  @staticmethod
+  def friday_ascii_art():
+    logo = """
+  / __/ _ \/  _/ _ \/ _ \ \/ /  / ___/ /  /  _/
+ / _// , _// // // / __ |\  /  / /__/ /___/ /  
+/_/ /_/|_/___/____/_/ |_|/_/   \___/____/___/  
+    """
+    return logo
 
   @classmethod
   def _log(cls, msg):
@@ -273,12 +287,13 @@ class AWSSetup:
       name = apiName,
       description = config['app:description'],
       version = config['app:version'],
-      endpointConiguration = {
+      endpointConfiguration = {
         'types' : [
           'REGIONAL'
         ]
       }
     )
+    return response
 
   def remove_iamrole(self, roleName):
     """
@@ -323,7 +338,6 @@ class AWSSetup:
 
     return response
 
-
   def package_lambda(self, roleARN):
     """
     Setup AWS Lambda
@@ -333,6 +347,15 @@ class AWSSetup:
 
     response = AWSSetup._generate_lambda(self.appName, self._lambda, roleARN, self.config)
     return response
+
+  def setup_api_gateway(self):
+    """
+    Setup AWS API Gateway endpoints
+    """
+    response = AWSSetup._generate_api_gateway(self.appName, self._apiGateway, self.config)
+    return response
+
+
 
 
 

@@ -107,7 +107,12 @@ class AWSSetupTest(unittest.TestCase):
 
     awsSetup = AWSSetup(self.appConfig)
     response = awsSetup.setup_api_gateway()
-    print(response)
+    self.assertTrue(
+      response['ResponseMetadata']['HTTPStatusCode'], 201
+    )
+
+    apiRestId = response['id']
+    awsSetup.delete_api_gateway_rest(apiRestId)
 
 
 if __name__ == '__main__':

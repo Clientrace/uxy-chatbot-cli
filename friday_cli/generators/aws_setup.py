@@ -279,6 +279,14 @@ class AWSSetup:
 
     return response
 
+
+  #TODO: Generate api gateway resource
+  @staticmethod
+  def _generate_api_gateway_resource(resourceName):
+    """
+    """
+    return
+
   @staticmethod
   # TODO: API Gateway Generator
   def _generate_api_gateway(appName, _apiGateway, config):
@@ -356,7 +364,21 @@ class AWSSetup:
     return response
 
 
+  def delete_api_gateway_rest(self, restApiId):
+    """
+    Get AWS API Gateway Rest API
+    :param restApiId: rest api id
+    :type restApiId: string
+    :param _apiGateway: api gateway instance
+    :type _apiGateway: boto3 object 
+    :returns: aws response
+    :rtype: dictionary
+    """
 
+    response = self._apiGateway.delete_rest_api(
+      restApiId = restApiId
+    )
+    return response
 
 
 

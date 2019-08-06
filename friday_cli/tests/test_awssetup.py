@@ -119,8 +119,9 @@ class AWSSetupTest(unittest.TestCase):
     """
     Test API Gateway add method
     """
+    lambdaARN = 'arn:aws:lambda:ap-southeast-1:940508673835:function:webview-auth'
     awsSetup = AWSSetup(self.appConfig)
-    response = awsSetup.get_lambda('webview-auth')
+    response = awsSetup.apigateway_addwebhook('2hvp05014h','4uf18c','POST',lambdaARN)
     print(response)
     # lambdaARN = 'arn:aws:lambda:ap-southeast-1:940508673835:function:webview-auth'
     # response = awsSetup.apigateway_addwebhook('2hvp05014h','4uf18c','POST',lambdaARN)

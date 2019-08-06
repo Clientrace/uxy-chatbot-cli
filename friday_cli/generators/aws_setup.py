@@ -362,26 +362,43 @@ class AWSSetup:
   @staticmethod
   def _add_friday_webhook_method(restApiId, resourceId, httpMethod, lambdaARN, _apiGateway, config):
     """
+    Add Friday App API Resource for FB Webhook
+    :param restApiId: aws api gateway rest api id
+    :type restApiId: string
+    :param resourceId: api resource id
+    :type resourceId: string
+    :param httpMethod: HTTP Method
+    :type httpMethod: string
+    :param lambdaARN: aws lambda resource name
+    :type lambdaARN: string
+    :param _apiGateway: api gateway instance
+    :type _apiGateway: boto3 object
+    :param config: app configuration
+    :type config: dictionary
     """
+
+    lambdaServicePath = '/2015-03-31/functions/'
     response = _apiGateway.put_integration(
       restApiId = restApiId,
       resourceId = resourceId,
       httpMethod = httpMethod,
       type = 'AWS',
       integrationHttpMethod = 'POST',
-      uri = 'arn:aws:apigateway:'+config['region']+':lambda:'+lambdaARN
+      uri = 'arn:aws:apigateway:' + config['aws:config']['region'] \
+        + ':lambda:path' + lambdaServicePath + lambdaARN + '/invocations'
     )
     return response
 
   def apigateway_addwebhook(self, restApiId, resourceId, httpMethod, lambdaARN):
-    # response = AWSSetup._add_friday_webhook_method(restApiId, resourceId, httpMethod, lambdaARN, self._apiGateway)
-    # return response
-    pass
+    response = AWSSetup._add_friday_webhook_method(restApiId, resourceId, httpMethod, lambdaARN, self._apiGateway, self.config)
+    return response
 
 
   @staticmethod
-  # TODO: API Gateway Generator
-  def _generate_friday_api(appName, _apiGateway, config):
+  def _generate_friday_api(appName, _apiGateway, lambdaARN, config):
+    """
+    """
+
     AWSSetup._log('+ Generating Rest API...')
     response = AWSSetup._generate_apigateway_rest_api(appName, _apiGateway, config)
     restApiId = response['id']
@@ -389,12 +406,10 @@ class AWSSetup:
     response = AWSSetup._generate_apigateway_resource(restApiId, 'friday-webhook', _apiGateway)
     webhookResourceId = response['id']
 
+    AWSSetup._add_friday_webhook_method(restApiId, webhookResourceId, 'POST', lambdaARN, _apiGateway, config)
+    AWSSetup._add_friday_webhook_method(restApiId, webhookResourceId, 'GET', lambdaARN, _apiGateway, config)
 
-    response = _apiGateway.update_method(
-      restApiId = restApiId,
-      resourceId = webhookResourceId,
-      httpMethod = 'GET'
-    )
+
 
 
 

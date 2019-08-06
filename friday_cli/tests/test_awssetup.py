@@ -59,6 +59,9 @@ class AWSSetupTest(unittest.TestCase):
 
   @unittest.skip('Temporary Skip..')
   def test_package_compression(self):
+    """
+    Test Zip compressor
+    """
     appPackageDir = 'friday_cli/friday_template'
     appPackageDest = '.tmp/test.zip'
 
@@ -70,21 +73,33 @@ class AWSSetupTest(unittest.TestCase):
     os.remove(appPackageDest)
 
 
-  @unittest.skip('Temporary Skip..')
   def test_lambda_generator(self):
     """
-    Test lambda generator
+    Test lambda generator (Function Create)
     """
-    awsSetup = AWSSetup(self.appConfig)
 
+    awsSetup = AWSSetup(self.appConfig)
+    awsSetup.remove_lambda('testbot-friday-app')
+
+    # Test Lambda Create
     iamRoleARN = awsSetup.setup_iamrole()
-    response = awsSetup.setup_lambda(iamRoleARN)
+    resp = awsSetup.package_lambda(iamRoleARN)
+    self.assertTrue(
+      resp['ResponseMetadata']['HTTPStatusCode'], 201
+    )
+
+    # Test Lambda Update
+    resp = awsSetup.package_lambda(iamRoleARN)
+    self.assertTrue(
+      resp['ResponseMetadata']['HTTPStatusCode'], 200
+    )
+
+    awsSetup.remove_iamrole('testbot-friday-app')
+    awsSetup.remove_lambda('testbot-friday-app')
 
 
 if __name__ == '__main__':
   unittest.main()
-
-
 
 
 

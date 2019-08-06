@@ -8,11 +8,10 @@ AWS Development Environment Setup
 """
 
 import os
-import boto3
-import uuid
 import json
+import uuid
+import boto3
 import zipfile
-
 
 class AWSSetup:
   """
@@ -49,6 +48,11 @@ class AWSSetup:
   verbosity = False
   zipPackageDir = '.tmp/fri.zip'
   fridayTemplateDir = 'friday_cli/friday_template'
+
+  # Lambda Function Vars
+  FUNCTION_NOT_FOUND = 0
+  FUNCTION_FOUND = 1
+  FUNCTION_GET_ERROR = 2
 
   def __init__(self, config):
     """
@@ -117,7 +121,6 @@ class AWSSetup:
     )
 
 
-
   @staticmethod
   def _generate_iam_role(appName, _iamClient, _iamRes, config):
     """
@@ -177,8 +180,6 @@ class AWSSetup:
     :type appPackageDir: string
     :param appPackageDest: zip file output destination
     :type appPackageDest: string
-    :returns: compressed zip file
-    :rtype: binary
     """
 
     zipf = zipfile.ZipFile(appPackageDest, 'w', zipfile.ZIP_DEFLATED)
@@ -191,11 +192,28 @@ class AWSSetup:
           arcname = fDir.replace(appPackageDir,'')
         )
 
-    AWSSetup._log('+ Loaidng app package...')
-    appZipFile = open(appPackageDest, 'rb')
-    zipBin = appZipFile.read()
-    appZipFile.close()
-    return zipBin
+
+  @staticmethod
+  def _function_exists(funcName, _lambda):
+    """
+    Check if lambda function exist
+    :param funcName: lambda function resource name
+    :type funcName: string
+    :param _lambda: aws lambda client controller
+    :type _lambda: boto3 client object
+    :returns: status code (FUNCTION_FOUND | FUNCTION_NOT_FOUND | FUNCTION_GET_ERROR)
+    :rtype: integer
+    """
+
+    try:
+      _lambda.get_function(
+        FunctionName = funcName
+      )
+      return AWSSetup.FUNCTION_FOUND
+    except Exception as e:
+      if( '(ResourceNotFoundException)' in str(e) ):
+        return AWSSetup.FUNCTION_NOT_FOUND
+    return AWSSetup.FUNCTION_GET_ERROR
 
   @staticmethod
   def _generate_lambda(appName, _lambda, roleARN, config):
@@ -213,22 +231,38 @@ class AWSSetup:
     """
 
     funcName = appName+'-friday-app-'+config['stage']
-    zipFile = AWSSetup._compress_app_package(
+    AWSSetup._compress_app_package(
       AWSSetup.fridayTemplateDir,
       AWSSetup.zipPackageDir
     )
 
-    AWSSetup._log('+ Creating lambda function...')
-    response = _lambda.create_function(
-      FunctionName = funcName,
-      Runtime = config['runtime'],
-      Role = roleARN,
-      Handler = config['aws:config']['lambda:handler'],
-      Code = {
-        'ZipFile' : zipFile
-      },
-      Timeout = config['aws:config']['lambda:timeout']
-    )
+    zipFile = open(AWSSetup.zipPackageDir,'rb')
+    zipFileBin = zipFile.read()
+    zipFile.close()
+
+    statusCode = AWSSetup._function_exists(funcName, _lambda)
+    if( statusCode == AWSSetup.FUNCTION_NOT_FOUND ):
+      AWSSetup._log('+ Creating lambda function...')
+      response = _lambda.create_function(
+        FunctionName = funcName,
+        Runtime = config['runtime'],
+        Role = roleARN,
+        Handler = config['aws:config']['lambda:handler'],
+        Code = {
+          'ZipFile' : zipFileBin
+        },
+        Timeout = config['aws:config']['lambda:timeout']
+      )
+    elif ( statusCode == AWSSetup.FUNCTION_FOUND ):
+      AWSSetup._log('+ Updating lambda function...')
+      response = _lambda.update_function_code(
+        FunctionName = funcName,
+        ZipFile = zipFileBin
+      )
+    else:
+      AWSSetup._log('==> ERROR: error getting lambda function')
+      response = {}
+
     return response
 
   @staticmethod
@@ -251,6 +285,8 @@ class AWSSetup:
     Deletes AWS IAM Role
     :param roleName: AWS Rolename
     :type roleName: string
+    :returns: boto3 aws response
+    :rtype: dictionary
     """
 
     response = self._iamClient.delete_role(
@@ -269,8 +305,26 @@ class AWSSetup:
     ARN = AWSSetup._generate_iam_role(self.appName, self._iamClient, self._iamRes, self.config)
     return ARN
 
+  def remove_lambda(self, funcName):
+    """
+    Remove AWS lambda function
+    :param funcName: aws lambda function name
+    :type funcName: string
+    :returns: boto3 aws response
+    :rtype: dictionary
+    """
 
-  def setup_lambda(self, roleARN):
+    try:
+      response = self._lambda.delete_function(
+        FunctionName = funcName
+      )
+    except Exception as e:
+      response = {}
+
+    return response
+
+
+  def package_lambda(self, roleARN):
     """
     Setup AWS Lambda
     :param roleARN: AWS IAM Role ARN
@@ -279,7 +333,6 @@ class AWSSetup:
 
     response = AWSSetup._generate_lambda(self.appName, self._lambda, roleARN, self.config)
     return response
-
 
 
 

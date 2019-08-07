@@ -272,10 +272,16 @@ class AWSSetup:
 
     statusCode = AWSSetup._function_exists(funcName, _lambda)
     if( statusCode == AWSSetup.FUNCTION_NOT_FOUND ):
+      runtime = None
+      if( config['runtime'] == 'go' ):
+        runtime = 'go1.x'
+      if( config['runtime'] == 'python' ):
+        runtime = 'python3.6'
+
       AWSSetup._log('+ Creating lambda function...')
       response = _lambda.create_function(
         FunctionName = funcName,
-        Runtime = config['runtime'],
+        Runtime = runtime,
         Role = roleARN,
         Handler = config['aws:config']['lambda:handler'],
         Code = {

@@ -9,7 +9,7 @@ AWSSetup Test
 import os.path
 import json
 import unittest
-from friday_cli.generators.aws_setup import AWSSetup
+from friday_cli._generators.aws_setup import AWSSetup
 
 class AWSSetupTest(unittest.TestCase):
   """
@@ -17,28 +17,7 @@ class AWSSetupTest(unittest.TestCase):
   """
 
   # Test Application Configuration
-  appConfig = {
-    'app:name' : 'testbot',
-    'app:version' : '1',
-    'app:description' : 'test description',
-    'description' : 'test chatbot',
-    'runtime' : 'python3.6',
-    'stage' : 'dev',
-    'aws:config' : {
-      'region' : 'ap-southeast-1',
-      'dynamodb:session-table' : {
-        'wcu' : 5,
-        'rcu' : 5
-      },
-      'dynamodb:auth-table' : {
-        'wcu' : 5,
-        'rcu' : 5
-      },
-      'lambda:handler' : 'index.lambda_handler',
-      'lambda:timeout' : 900
-    },
-    'verbosity' : False
-  }
+  appConfig = json.loads(open('friday_cli/tests/testconfig.json').read())
 
   @unittest.skip('Temporary Skip..')
   def test_iamrole_generator(self):
@@ -101,6 +80,7 @@ class AWSSetupTest(unittest.TestCase):
     awsSetup.remove_lambda('testbot-friday-app')
 
 
+  @unittest.skip('Temporary Skip..')
   def test_apigateway_create_rest(self):
     """
     Test API Gateway Rest API Generator
@@ -122,5 +102,7 @@ class AWSSetupTest(unittest.TestCase):
 
 if __name__ == '__main__':
   unittest.main()
+
+
 
 

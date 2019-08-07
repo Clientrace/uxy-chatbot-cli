@@ -101,32 +101,23 @@ class AWSSetupTest(unittest.TestCase):
     awsSetup.remove_lambda('testbot-friday-app')
 
 
-  @unittest.skip('Temporary Skip..')
   def test_apigateway_create_rest(self):
     """
     Test API Gateway Rest API Generator
     """
 
     awsSetup = AWSSetup(self.appConfig)
-    response = awsSetup.create_apigateway_rest_api()
-    self.assertTrue(
-      response['ResponseMetadata']['HTTPStatusCode'], 201
-    )
-    apiRestId = response['id']
-    awsSetup.delete_apigateway_rest(apiRestId)
+    iamRoleARN = awsSetup.setup_iamrole()
 
-  def test_apigateway_addmethod(self):
-    """
-    Test API Gateway add method
-    """
-    lambdaARN = 'arn:aws:lambda:ap-southeast-1:940508673835:function:webview-auth'
-    awsSetup = AWSSetup(self.appConfig)
-    response = awsSetup.apigateway_addwebhook('2hvp05014h','4uf18c','POST',lambdaARN)
-    print(response)
-    # lambdaARN = 'arn:aws:lambda:ap-southeast-1:940508673835:function:webview-auth'
-    # response = awsSetup.apigateway_addwebhook('2hvp05014h','4uf18c','POST',lambdaARN)
-    # print(response)
+    resp = awsSetup.package_lambda(iamRoleARN)
+    lambdaARN = resp['FunctionArn']
 
+    resp = awsSetup.setup_friday_api(lambdaARN)
+    restApiId = resp['restApiId']
+
+    awsSetup.delete_apigateway_rest(restApiId)
+    awsSetup.remove_iamrole('testbot-friday-app')
+    awsSetup.remove_lambda('testbot-friday-app')
     
 
 if __name__ == '__main__':

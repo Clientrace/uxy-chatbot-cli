@@ -83,7 +83,7 @@ class AWSSetup:
 
   @staticmethod
   def friday_ascii_art():
-    logo = """
+    logo = """\n
   / __/ _ \/  _/ _ \/ _ \ \/ /  / ___/ /  /  _/
  / _// , _// // // / __ |\  /  / /__/ /___/ /  
 /_/ /_/|_/___/____/_/ |_|/_/   \___/____/___/  
@@ -98,7 +98,7 @@ class AWSSetup:
     :type msg: string
     """
     if( cls.verbosity ):
-      print(msg)
+      print('[AWS]: ' + msg)
 
   # TODO: save app config to s3 bucket
   @staticmethod
@@ -182,6 +182,8 @@ class AWSSetup:
         apiRole = _iamRes.Role(roleName)
         roleArn = apiRole.arn
         AWSSetup._log('==> Role Created.')
+      else:
+        print(str(e))
 
     AWSSetup._log('=> Role ARN: '+str(roleArn))
     return roleArn
@@ -312,8 +314,29 @@ class AWSSetup:
     )
     return response['items'][0]['id']
 
+  @staticmethod
+  def _deploy_api(restApiId, _apiGateway, config):
+    """
+    Deploy Friday Rest API
+    :param restApiId: AWS API Gateway Rest API ID
+    :type restApiId: string
+    :param _apiGateway: API Gateway instance
+    :type _apiGateway: boto3 object
+    """
+    # Create Deployment
+    _apiGateway.create_deployment(
+      restApiId = restApiId,
+      stageName = 'v'+config['app:version']
+    )
 
-  #TODO: Generate api gateway resource
+    response = _apiGateway.get_stage(
+      restApiId = restApiId,
+      stageName = 'v'+config['app:version']
+    )
+
+    return response
+
+
   @staticmethod
   def _generate_apigateway_resource(restApiId, pathPart, _apiGateway):
     """
@@ -323,6 +346,8 @@ class AWSSetup:
     :param pathPart: rest path
     :param _apiGateway: API Gateway instance
     :type _apiGateway: boto3 object
+    :param config: app configuration
+    :type config: dictionary
     :returns: rest api root id
     :rtype: string
     """
@@ -343,6 +368,8 @@ class AWSSetup:
     :type appName: string
     :param _apiGateway: api gateway instance
     :type _apiGateway: boto3 object
+    :param config: app configuration
+    :type config: dictionary
     :returns: aws response
     :rtype: dictionary
     """
@@ -375,6 +402,8 @@ class AWSSetup:
     :type _apiGateway: boto3 object
     :param config: app configuration
     :type config: dictionary
+    :returns: aws response
+    :rtype: dictionary
     """
 
     lambdaServicePath = '/2015-03-31/functions/'
@@ -389,14 +418,20 @@ class AWSSetup:
     )
     return response
 
-  def apigateway_addwebhook(self, restApiId, resourceId, httpMethod, lambdaARN):
-    response = AWSSetup._add_friday_webhook_method(restApiId, resourceId, httpMethod, lambdaARN, self._apiGateway, self.config)
-    return response
-
-
   @staticmethod
   def _generate_friday_api(appName, _apiGateway, lambdaARN, config):
     """
+    Generate Friday API
+    :param appName: application name
+    :type appName: string
+    :param _apiGateway: api gateway instance
+    :type _apiGateway: boto3 object
+    :param lambdaARN: aws lambda resource name
+    :type lambdaARN: string
+    :param config: app configuration
+    :type config: dictionary
+    :returns: rest api id and invocation url
+    :rtype: dictionary
     """
 
     AWSSetup._log('+ Generating Rest API...')
@@ -409,9 +444,16 @@ class AWSSetup:
     AWSSetup._add_friday_webhook_method(restApiId, webhookResourceId, 'POST', lambdaARN, _apiGateway, config)
     AWSSetup._add_friday_webhook_method(restApiId, webhookResourceId, 'GET', lambdaARN, _apiGateway, config)
 
+    AWSSetup._log('+ Deploying API...')
+    response = AWSSetup._deploy_api(restApiId, _apiGateway, config)
+    invokeURL = 'https://'+restApiId+'execute-api.'+config['aws:config']['region']+'.amazonaws.com/'+config['app:version']
 
+    AWSSetup._log('==> API Deployed')
 
-
+    return {
+      'restApiId' : restApiId,
+      'invokeURL' : invokeURL
+    }
 
   def remove_iamrole(self, roleName):
     """
@@ -456,12 +498,6 @@ class AWSSetup:
 
     return response
 
-  def get_lambda(self, funcName):
-    """
-    """
-    response = AWSSetup._get_lambda_function(funcName, self._lambda)
-    return response
-
   def package_lambda(self, roleARN):
     """
     Setup AWS Lambda
@@ -472,19 +508,17 @@ class AWSSetup:
     response = AWSSetup._generate_lambda(self.appName, self._lambda, roleARN, self.config)
     return response
 
-  def create_apigateway_res(self, restApiId, pathPart):
+  def setup_friday_api(self, lambdaARN):
     """
-    Setup AWS API Gateway endpoints
+    Setup AWS Friday App API Gateway RestAPI
+    :param lambdaARN: aws lambda resource name
+    :type lambdaARN: string
+    :returns: api invocation url
+    :rtype: string
     """
-    response = AWSSetup._generate_apigateway_resource(restApiId, pathPart, self._apiGateway)
-    return response
 
-  def create_apigateway_rest_api(self):
-    """
-    """
-    response = AWSSetup._generate_apigateway_rest_api(self.appName, self._apiGateway, self.config)
+    response = AWSSetup._generate_friday_api(self.appName, self._apiGateway, lambdaARN, self.config)
     return response
-
 
   def delete_apigateway_rest(self, restApiId):
     """

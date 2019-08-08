@@ -10,14 +10,9 @@
       "wcu" : 5,
       "rcu" : 5
     },
-    "dynamodb:auth-table" : {
-      "wcu" : 5,
-      "rcu" : 5
-    },
     "lambda:handler" : "index.lambda_handler",
     "lambda:timeout" : 900
   },
   "verbosity" : false
 }
-
 

@@ -1,0 +1,127 @@
+{
+  "app:name": {
+    "_rule": {
+      "type": "string",
+      "value": {
+        "set": "custom",
+        "type": "any"
+      }
+    }
+  },
+  "app:version": {
+    "_rule": {
+      "type": "string",
+      "value": {
+        "set": "custom",
+        "type": "numeric"
+      }
+    }
+  },
+  "app:description": {
+    "_rule": {
+      "type": "string",
+      "value": {
+        "set": "custom",
+        "type": "any"
+      }
+    }
+  },
+  "runtime": {
+    "_rule": {
+      "type": "string",
+      "value": {
+        "set": "predefined",
+        "type": "any",
+        "lists": [
+          "python",
+          "go"
+        ]
+      }
+    }
+  },
+  "stage": {
+    "_rule": {
+      "type": "string",
+      "value": {
+        "set": "custom",
+        "type": "any"
+      }
+    }
+  },
+  "aws:config": {
+    "region": {
+      "_rule": {
+        "type": "string",
+        "value": {
+          "set": "predefined",
+          "type": "any",
+          "lists": [
+            "us-east-1",
+            "us-east-2",
+            "us-west-1",
+            "us-west-2",
+            "ap-south-1",
+            "ap-northeast-1",
+            "ap-northeast2",
+            "ca-central-1",
+            "eu-central-1",
+            "eu-west-1",
+            "eu-west-2",
+            "eu-west-3",
+            "eu-north-1",
+            "me-south-1",
+            "sa-east-1"
+          ]
+        }
+      }
+    },
+    "dynamodb:session-table": {
+      "wcu": {
+        "_rule": {
+          "type": "integer",
+          "value": {
+            "set": "custom",
+            "type": "numeric"
+          }
+        }
+      },
+      "rcu": {
+        "_rule": {
+          "set": "custom",
+          "type": "integer",
+          "value": {
+            "set": "custom",
+            "type": "numeric"
+          }
+        }
+      }
+    },
+    "lambda:handler": {
+      "_rule": {
+        "type": "string",
+        "value": {
+          "set": "custom",
+          "type": "any"
+        }
+      }
+    },
+    "lambda:timeout": {
+      "_rule": {
+        "type": "integer",
+        "value": {
+          "set": "custom",
+          "type": "numeric"
+        }
+      }
+    }
+  },
+  "verbosity": {
+    "_rule": {
+      "type": "boolean",
+      "value": {
+        "set": "custom",
+        "type": "boolean"
+      }
+    }
+  }
+}

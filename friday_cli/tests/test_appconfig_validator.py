@@ -18,7 +18,9 @@ class AppConfigValidatorTest(unittest.TestCase):
 
   # Test Application Configuration
   appConfig = json.loads(open('friday_cli/tests/testconfig/appconfig.json').read())
+  appConfigFail = json.loads(open('friday_cli/tests/testconfig/appconfig.json').read())
 
+  @unittest.skip("temporary skip..")
   def test_attrib_check(self):
     """
     Test attrib_check
@@ -27,13 +29,14 @@ class AppConfigValidatorTest(unittest.TestCase):
     self.assertTrue(appconfigValidator.attrib_check())
 
 
-  @unittest.skip('test')
   def test_type_check(self):
     """
-    Test type_check
+    Test rule_validation_check
     """
+
+
     appconfigValidator = AppConfigValidator(self.appConfig)
-    appconfigValidator.type_check()
+    appconfigValidator.rule_validation_check()
 
 
 

@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from friday_app.chatbot_core._modules.e2e import view_parser
+from uxy_app.chatbot_core._modules.e2e import view_parser
 
 
 class TestViewPaser(unittest.TestCase):

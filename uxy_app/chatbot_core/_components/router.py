@@ -9,13 +9,13 @@ Chabot state router
 
 
 from datetime import datetime, timedelta
-from friday_app.shared.configuration import config
-from friday_app.utility.aws_services.dynamodb import Dynamodb
-from friday_app.chatbot_core._modules.e2e import input_parser
-from friday_app.chatbot_core._modules.e2e import view_parser
-from friday_app.chatbot_core._components import convo_data
-from friday_app.chatbot_core._components import spiel
-from friday_app.chatbot_core._components import persist
+from uxy_app.shared.configuration import config
+from uxy_app.utility.aws_services.dynamodb import Dynamodb
+from uxy_app.chatbot_core._modules.e2e import input_parser
+from uxy_app.chatbot_core._modules.e2e import view_parser
+from uxy_app.chatbot_core._components import convo_data
+from uxy_app.chatbot_core._components import spiel
+from uxy_app.chatbot_core._components import persist
 
 
 global DYNAMODB
@@ -132,7 +132,7 @@ def route(userID, sessionName, data=None):
   responses,altResponse,choices,optionMatched,valid,maxRetry = view_parser.exe(userID,sessionName,data)
 
   if( data ):
-    unit = __import__('friday_app.chatbot_core._components.unit.'+sessionName,fromlist=[sessionName])
+    unit = __import__('uxy_app.chatbot_core._components.unit.'+sessionName,fromlist=[sessionName])
     responses, unitValid = unit.exe(userID, data, responses, altResponse, choices, optionMatched, valid, maxRetry)
     if( unitValid != None ):
       if( not unitValid ):

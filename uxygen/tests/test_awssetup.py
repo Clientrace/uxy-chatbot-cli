@@ -9,7 +9,7 @@ AWSSetup Test
 import os.path
 import json
 import unittest
-from friday_cli._generators.aws_setup import AWSSetup
+from uxy_cli._generators.aws_setup import AWSSetup
 
 class AWSSetupTest(unittest.TestCase):
   """
@@ -17,7 +17,7 @@ class AWSSetupTest(unittest.TestCase):
   """
 
   # Test Application Configuration
-  appConfig = json.loads(open('friday_cli/tests/testconfig.json').read())
+  appConfig = json.loads(open('uxy_cli/tests/testconfig.json').read())
 
   @unittest.skip('Temporary Skip..')
   def test_iamrole_generator(self):
@@ -29,10 +29,10 @@ class AWSSetupTest(unittest.TestCase):
     ARN = awsSetup.setup_iamrole()
 
     self.assertTrue( ARN != None )
-    self.assertTrue( 'testbot-friday-app' in ARN )
+    self.assertTrue( 'testbot-uxy-app' in ARN )
 
     # Remove Generated ARN
-    resp = awsSetup.remove_iamrole('testbot-friday-app')
+    resp = awsSetup.remove_iamrole('testbot-uxy-app')
     self.assertTrue( 
       resp['ResponseMetadata']['HTTPStatusCode'], 200
     )
@@ -43,7 +43,7 @@ class AWSSetupTest(unittest.TestCase):
     """
     Test Zip compressor
     """
-    appPackageDir = 'friday_cli/friday_template'
+    appPackageDir = 'uxy_cli/project_template'
     appPackageDest = '.tmp/test.zip'
 
     # Removes Initial File
@@ -61,7 +61,7 @@ class AWSSetupTest(unittest.TestCase):
     """
 
     awsSetup = AWSSetup(self.appConfig)
-    awsSetup.remove_lambda('testbot-friday-app')
+    awsSetup.remove_lambda('testbot-uxy-app')
 
     # Test Lambda Create
     iamRoleARN = awsSetup.setup_iamrole()
@@ -76,8 +76,8 @@ class AWSSetupTest(unittest.TestCase):
       resp['ResponseMetadata']['HTTPStatusCode'], 200
     )
 
-    awsSetup.remove_iamrole('testbot-friday-app')
-    awsSetup.remove_lambda('testbot-friday-app')
+    awsSetup.remove_iamrole('testbot-uxy-app')
+    awsSetup.remove_lambda('testbot-uxy-app')
 
 
   @unittest.skip('Temporary Skip..')
@@ -92,12 +92,12 @@ class AWSSetupTest(unittest.TestCase):
     resp = awsSetup.package_lambda(iamRoleARN)
     lambdaARN = resp['FunctionArn']
 
-    resp = awsSetup.setup_friday_api(lambdaARN)
+    resp = awsSetup.setup_uxy_api(lambdaARN)
     restApiId = resp['restApiId']
 
     awsSetup.delete_apigateway_rest(restApiId)
-    awsSetup.remove_iamrole('testbot-friday-app')
-    awsSetup.remove_lambda('testbot-friday-app')
+    awsSetup.remove_iamrole('testbot-uxy-app')
+    awsSetup.remove_lambda('testbot-uxy-app')
     
 
 if __name__ == '__main__':

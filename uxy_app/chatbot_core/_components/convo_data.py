@@ -5,8 +5,8 @@ version 0.0.1
 Documented via reST
 Holds Chatbot-User conversation data
 """
-from friday_app.shared.configuration import config
-from friday_app.utility.aws_services.dynamodb import Dynamodb
+from uxy_app.shared.configuration import config
+from uxy_app.utility.aws_services.dynamodb import Dynamodb
 
 global DYNAMODB
 DYNAMODB = Dynamodb(

@@ -12,7 +12,7 @@ import json
 import random
 
 global DISPLAY_DIR
-DISPLAY_DIR = 'friday_app/chatbot_core/_components/content/'
+DISPLAY_DIR = 'uxy_app/chatbot_core/_components/content/'
 
 
 # Load Display Json

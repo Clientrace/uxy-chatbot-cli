@@ -47,7 +47,7 @@ class AWSSetup:
 
   verbosity = False
   zipPackageDir = '.tmp/fri.zip'
-  fridayTemplateDir = 'friday_cli/friday_template'
+  uxyTemplateDir = 'uxy_cli/project_template'
 
   # Lambda Function Vars
   FUNCTION_NOT_FOUND = 0
@@ -82,7 +82,7 @@ class AWSSetup:
      region_name=config['aws:config']['region'])
 
   @staticmethod
-  def friday_ascii_art():
+  def uxy_ascii_art():
     logo = """\n
   / __/ _ \/  _/ _ \/ _ \ \/ /  / ___/ /  /  _/
  / _// , _// // // / __ |\  /  / /__/ /___/ /  
@@ -117,7 +117,7 @@ class AWSSetup:
     :param config: app configuration
     :param type
     """
-    sessionTableName = appName+'-friday-session-'+config['stage']
+    sessionTableName = appName+'-uxy-session-'+config['stage']
     dynamodb.create_table(
       AttributeDefinitions = [{
         'AttributeName' : 'userID',
@@ -151,7 +151,7 @@ class AWSSetup:
     :rtype: dictionary
     """
 
-    roleName = appName+'-friday-app'
+    roleName = appName+'-uxy-app'
     AWSSetup._log('+ Creating IAM Role...')
     try:
       _iamClient.create_role(
@@ -260,9 +260,9 @@ class AWSSetup:
     :rtype: dictionary
     """
 
-    funcName = appName+'-friday-app-'+config['stage']
+    funcName = appName+'-uxy-app-'+config['stage']
     AWSSetup._compress_app_package(
-      AWSSetup.fridayTemplateDir,
+      AWSSetup.uxyTemplateDir,
       AWSSetup.zipPackageDir
     )
 
@@ -323,7 +323,7 @@ class AWSSetup:
   @staticmethod
   def _deploy_api(restApiId, _apiGateway, config):
     """
-    Deploy Friday Rest API
+    Deploy uxy Rest API
     :param restApiId: AWS API Gateway Rest API ID
     :type restApiId: string
     :param _apiGateway: API Gateway instance
@@ -379,7 +379,7 @@ class AWSSetup:
     :returns: aws response
     :rtype: dictionary
     """
-    apiName = appName+'-friday-app-'+config['stage']
+    apiName = appName+'-uxy-app-'+config['stage']
     response = _apiGateway.create_rest_api(
       name = apiName,
       description = config['app:description'],
@@ -393,9 +393,9 @@ class AWSSetup:
     return response
 
   @staticmethod
-  def _add_friday_webhook_method(restApiId, resourceId, httpMethod, lambdaARN, _apiGateway, config):
+  def _add_uxy_webhook_method(restApiId, resourceId, httpMethod, lambdaARN, _apiGateway, config):
     """
-    Add Friday App API Resource for FB Webhook
+    Add uxy App API Resource for FB Webhook
     :param restApiId: aws api gateway rest api id
     :type restApiId: string
     :param resourceId: api resource id
@@ -425,9 +425,9 @@ class AWSSetup:
     return response
 
   @staticmethod
-  def _generate_friday_api(appName, _apiGateway, lambdaARN, config):
+  def _generate_uxy_api(appName, _apiGateway, lambdaARN, config):
     """
-    Generate Friday API
+    Generate uxy API
     :param appName: application name
     :type appName: string
     :param _apiGateway: api gateway instance
@@ -444,11 +444,11 @@ class AWSSetup:
     response = AWSSetup._generate_apigateway_rest_api(appName, _apiGateway, config)
     restApiId = response['id']
 
-    response = AWSSetup._generate_apigateway_resource(restApiId, 'friday-webhook', _apiGateway)
+    response = AWSSetup._generate_apigateway_resource(restApiId, 'uxy-webhook', _apiGateway)
     webhookResourceId = response['id']
 
-    AWSSetup._add_friday_webhook_method(restApiId, webhookResourceId, 'POST', lambdaARN, _apiGateway, config)
-    AWSSetup._add_friday_webhook_method(restApiId, webhookResourceId, 'GET', lambdaARN, _apiGateway, config)
+    AWSSetup._add_uxy_webhook_method(restApiId, webhookResourceId, 'POST', lambdaARN, _apiGateway, config)
+    AWSSetup._add_uxy_webhook_method(restApiId, webhookResourceId, 'GET', lambdaARN, _apiGateway, config)
 
     AWSSetup._log('+ Deploying API...')
     response = AWSSetup._deploy_api(restApiId, _apiGateway, config)
@@ -514,16 +514,16 @@ class AWSSetup:
     response = AWSSetup._generate_lambda(self.appName, self._lambda, roleARN, self.config)
     return response
 
-  def setup_friday_api(self, lambdaARN):
+  def setup_uxy_api(self, lambdaARN):
     """
-    Setup AWS Friday App API Gateway RestAPI
+    Setup AWS uxy App API Gateway RestAPI
     :param lambdaARN: aws lambda resource name
     :type lambdaARN: string
     :returns: api invocation url
     :rtype: string
     """
 
-    response = AWSSetup._generate_friday_api(self.appName, self._apiGateway, lambdaARN, self.config)
+    response = AWSSetup._generate_uxy_api(self.appName, self._apiGateway, lambdaARN, self.config)
     return response
 
   def delete_apigateway_rest(self, restApiId):

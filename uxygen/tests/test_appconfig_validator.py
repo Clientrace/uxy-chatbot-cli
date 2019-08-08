@@ -8,17 +8,17 @@ App config validator Test
 
 import json
 import unittest
-from friday_cli._validators.appconfig_validator import AppConfigValidator
+from uxy_cli._validators.appconfig_validator import AppConfigValidator
 
 
 class AppConfigValidatorTest(unittest.TestCase):
   """
-  Friday Application Config File unit test
+  uxy Application Config File unit test
   """
 
   # Test Application Configuration
-  appConfig = json.loads(open('friday_cli/tests/testconfig/appconfig.json').read())
-  appConfigFail = json.loads(open('friday_cli/tests/testconfig/appconfig.json').read())
+  appConfig = json.loads(open('uxy_cli/tests/testconfig/appconfig.json').read())
+  appConfigFail = json.loads(open('uxy_cli/tests/testconfig/appconfig.json').read())
 
   @unittest.skip("temporary skip..")
   def test_attrib_check(self):

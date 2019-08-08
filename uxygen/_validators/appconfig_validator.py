@@ -14,7 +14,7 @@ class AppConfigValidator:
   """
 
   # App config file validation rule:
-  validationRule = json.loads(open('friday_cli/_validators/rules/appconfig_rule.json').read())
+  validationRule = json.loads(open('uxy_cli/_validators/rules/appconfig_rule.json').read())
 
   def __init__(self, appConfig):
     """

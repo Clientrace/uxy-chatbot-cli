@@ -2,7 +2,7 @@ import os
 import json
 
 global DEFAULTS
-DEFAULTS = json.loads(open('src/friday.json')).read()
+DEFAULTS = json.loads(open('src/uxy.json')).read()
 
 def var(key):
   global DEFAULTS

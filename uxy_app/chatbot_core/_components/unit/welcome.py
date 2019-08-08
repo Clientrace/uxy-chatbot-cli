@@ -1,7 +1,7 @@
 
-from friday_app.chatbot_core._components import router
-from friday_app.chatbot_core._components import spiel
-from friday_app.chatbot_core._components import convo_data
+from uxy_app.chatbot_core._components import router
+from uxy_app.chatbot_core._components import spiel
+from uxy_app.chatbot_core._components import convo_data
 
 
 

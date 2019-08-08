@@ -1,6 +1,0 @@
-{
-  "stage" : "dev",
-  "botanme" : "friday",
-  "DYNAMODB_USER_SESSION_TABLE" : "friday-chatbot-app-session"
-}
-

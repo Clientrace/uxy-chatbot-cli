@@ -8,12 +8,12 @@ Parse user view from component spiels
 
 import re
 import json
-from friday_app.chatbot_core._components import spiel 
-from friday_app.chatbot_core._components import convo_data 
-from friday_app.shared.configuration import config
+from uxy_app.chatbot_core._components import spiel 
+from uxy_app.chatbot_core._components import convo_data 
+from uxy_app.shared.configuration import config
 
 global VIEW_DIR
-VIEW_DIR = 'friday_app/chatbot_core/_components/view/'
+VIEW_DIR = 'uxy_app/chatbot_core/_components/view/'
 
 
 # Get view json

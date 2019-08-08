@@ -1,4 +1,4 @@
-from friday_cli.generators.aws_setup import AWSSetup
+from uxy_cli.generators.aws_setup import AWSSetup
 
 appConfig = {
   'app:name' : 'testbot',

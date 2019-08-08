@@ -1,0 +1,6 @@
+{
+  "stage" : "dev",
+  "botanme" : "uxy",
+  "DYNAMODB_USER_SESSION_TABLE" : "uxy-chatbot-app-session"
+}
+

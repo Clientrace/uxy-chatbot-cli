@@ -25,6 +25,22 @@ class AppConfigValidator:
     self.appConfig = appConfig
 
   @staticmethod
+  def valid_json(appConfig):
+    """
+    Checks if the param string is a valid json format
+    :param appConfig: application configuration
+    :param type: string
+    :returns: validation result
+    :rtype: boolean
+    """
+    try:
+      json.loads(appConfig)
+    except ValueError:
+      return False
+    return True
+
+
+  @staticmethod
   def _compare_keys(config, dictRule):
     for val in dictRule.keys():
       if( val not in config.keys()):
@@ -36,39 +52,50 @@ class AppConfigValidator:
     return True
 
   @staticmethod
-  def _rule_validator(val, rule):
-    if( rule['type'] == 'string' ):
-      if( type(val) != str ):
-        return False
+  def _rule_validator(field, val, rule):
 
     if( rule['type'] == 'integer' ):
       if( type(val) != int ):
+        print('[ AppConfig Error ]: '+field+' value must be integer')
         return False
 
-    if( rule['type'] != 'boolean' ):
+    if( rule['type'] == 'boolean' ):
       if( type(val) != bool ):
+        print('[ AppConfig Error ]: '+field+' value must be boolean')
         return False
 
     if( rule['value']['set'] == 'predefined' ):
       if( val not in rule['value']['lists'] ):
+        print('[ AppConfig Error ]: '+field+' should be of the following values: '+str(rule['value']['lists']))
         return False
 
-    if( rule['value']['type'] == 'numeric' ):
-      if( not val.isdigit() ):
+    if( rule['type'] == 'string' ):
+      val = val.strip()
+      if( type(val) != str ):
+        print('[ AppConfig Error ]: '+field+' value must be string')
         return False
+      if( val == '' ):
+        print('[ AppConfig Error ]: '+field+' should not be empty')
+        return False
+      if( rule['value']['type'] == 'numeric' ):
+        if( not val.isdigit() ):
+          print('[ AppConfig Error ]: '+field+' value should be numeric')
+          return False
 
     return True
 
 
   @staticmethod
-  def _type_check(config, dictRule):
+  def _rule_check(config, dictRule):
     for val in dictRule.keys():
       if('_rule' in dictRule[val]):
-        AppConfigValidator._rule_validator(val, dictRule[val]['_rule'])
+        valid = AppConfigValidator._rule_validator(val, config[val], dictRule[val]['_rule'])
+        if( not valid ):
+          return valid
 
     for val in dictRule.keys():
       if( '_rule' not in dictRule[val] ):
-        return AppConfigValidator._type_check(config[val], dictRule[val])
+        return AppConfigValidator._rule_check(config[val], dictRule[val])
 
     return True
 
@@ -89,9 +116,7 @@ class AppConfigValidator:
     :returns: validation result
     :rtype: boolean
     """
-    result = AppConfigValidator._type_check(self.appConfig, AppConfigValidator.validationRule)
+    result = AppConfigValidator._rule_check(self.appConfig, AppConfigValidator.validationRule)
     return result
-
-
 
 

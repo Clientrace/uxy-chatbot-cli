@@ -29,14 +29,34 @@ class AppConfigValidatorTest(unittest.TestCase):
     self.assertTrue(appconfigValidator.attrib_check())
 
 
-  def test_type_check(self):
+  def test_rule_check(self):
     """
     Test rule_validation_check
     """
+    print("\nRule Check:")
+    config = self.appConfig.copy()
+    appconfigValidator = AppConfigValidator(config)
+    self.assertTrue(appconfigValidator.rule_validation_check())
+
+    # Test: config value is empty
+    config['app:name'] = ''
+    appconfigValidator = AppConfigValidator(config)
+    self.assertFalse(appconfigValidator.rule_validation_check())
+
+    # Test: config value invalid type
+    config = self.appConfig.copy()
+    config['app:version'] = "a"
+    appconfigValidator = AppConfigValidator(config)
+    self.assertFalse(appconfigValidator.rule_validation_check())
 
 
-    appconfigValidator = AppConfigValidator(self.appConfig)
-    appconfigValidator.rule_validation_check()
+    # Test: config invalid option value
+    config = self.appConfig.copy()
+    config['aws:config']['region'] = "test"
+    appconfigValidator = AppConfigValidator(config)
+    self.assertFalse(appconfigValidator.rule_validation_check())
+
+    
 
 
 

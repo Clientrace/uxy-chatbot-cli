@@ -17,9 +17,9 @@ class AWSSetupTest(unittest.TestCase):
   """
 
   # Test Application Configuration
-  appConfig = json.loads(open('uxy_cli/tests/testconfig.json').read())
+  appConfig = json.loads(open('uxy_cli/tests/testconfig/appconfig.json').read())
 
-  @unittest.skip('Temporary Skip..')
+  @unittest.skip('Skip')
   def test_iamrole_generator(self):
     """
     Test iamRole generator
@@ -38,7 +38,8 @@ class AWSSetupTest(unittest.TestCase):
     )
 
 
-  @unittest.skip('Temporary Skip..')
+
+  @unittest.skip('Skip')
   def test_package_compression(self):
     """
     Test Zip compressor
@@ -54,7 +55,7 @@ class AWSSetupTest(unittest.TestCase):
     os.remove(appPackageDest)
 
 
-  @unittest.skip('Temporary Skip..')
+  @unittest.skip('Skip')
   def test_lambda_generator(self):
     """
     Test lambda generator (Function Create)
@@ -79,25 +80,28 @@ class AWSSetupTest(unittest.TestCase):
     awsSetup.remove_iamrole('testbot-uxy-app')
     awsSetup.remove_lambda('testbot-uxy-app')
 
-
-  @unittest.skip('Temporary Skip..')
   def test_apigateway_create_rest(self):
     """
     Test API Gateway Rest API Generator
     """
 
+    # print('Uxygen Test')
     awsSetup = AWSSetup(self.appConfig)
     iamRoleARN = awsSetup.setup_iamrole()
 
     resp = awsSetup.package_lambda(iamRoleARN)
     lambdaARN = resp['FunctionArn']
 
-    resp = awsSetup.setup_uxy_api(lambdaARN)
-    restApiId = resp['restApiId']
+    awsSetup._add_uxy_webhook_method('fkci9kzuhj','uh98h1','POST',lambdaARN, awsSetup._apiGateway, self.appConfig)
 
-    awsSetup.delete_apigateway_rest(restApiId)
-    awsSetup.remove_iamrole('testbot-uxy-app')
-    awsSetup.remove_lambda('testbot-uxy-app')
+
+    # resp = awsSetup.setup_uxy_api(lambdaARN)
+    # restApiId = resp['restApiId']
+
+    # awsSetup.delete_apigateway_rest(restApiId)
+    # awsSetup.remove_iamrole('testbot-uxy-app')
+    # awsSetup.remove_lambda('testbot-uxy-app')
+
     
 
 if __name__ == '__main__':

@@ -7,7 +7,7 @@ Documented via reST
 
 
 from uxy_app.utility.api_wrappers.facebook import Facebook
-from uxy_app.shared import config
+from uxy_app.shared.configuration import config
 
 
 def parse_string_codes(fb, string_msg):

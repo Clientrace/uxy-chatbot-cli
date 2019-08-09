@@ -169,19 +169,19 @@ class AWSSetup:
       )
       apiRole = _iamRes.Role(roleName)
       roleArn = apiRole.arn
-      for role in config['iamRoles']:
+      for role in config['aws:config']['iam:roles']:
         AWSSetup._log('+ Attaching Role: '+role+'...')
         apiRole.attach_policy(
           PolicyArn = role
         )
       
       apiRole.reload()
-      AWSSetup._log('==> Role Created.')
+      AWSSetup._log('=> Role Created.')
     except Exception as e:
       if( '(EntityAlreadyExists)' in str(e) ):
         apiRole = _iamRes.Role(roleName)
         roleArn = apiRole.arn
-        AWSSetup._log('==> Role Created.')
+        AWSSetup._log('=> Role Created.')
       else:
         print(str(e))
 
@@ -289,15 +289,18 @@ class AWSSetup:
         },
         Timeout = config['aws:config']['lambda:timeout']
       )
+      AWSSetup._log("=> Lambda package deployed")
     elif ( statusCode == AWSSetup.FUNCTION_FOUND ):
       AWSSetup._log('+ Updating lambda function...')
       response = _lambda.update_function_code(
         FunctionName = funcName,
         ZipFile = zipFileBin
       )
+      AWSSetup._log("=> Lambda package deployed")
     else:
-      AWSSetup._log('==> ERROR: error getting lambda function')
+      AWSSetup._log('=> ERROR: error getting lambda function')
       response = {}
+
 
     return response
 
@@ -412,15 +415,22 @@ class AWSSetup:
     :rtype: dictionary
     """
 
-    lambdaServicePath = '/2015-03-31/functions/'
+    _apiGateway.put_method(
+      restApiId = restApiId,
+      resourceId = resourceId,
+      httpMethod = httpMethod,
+      authorizationType = 'NONE'
+    )
+
+    lambdaMethodURI = 'arn:aws:apigateway:'+config['aws:config']['region']+':lambda:path'\
+      + '/2015-03-31/functions/'+lambdaARN+'/invocations'
     response = _apiGateway.put_integration(
       restApiId = restApiId,
       resourceId = resourceId,
       httpMethod = httpMethod,
       type = 'AWS',
       integrationHttpMethod = 'POST',
-      uri = 'arn:aws:apigateway:' + config['aws:config']['region'] \
-        + ':lambda:path' + lambdaServicePath + lambdaARN + '/invocations'
+      uri = lambdaMethodURI
     )
     return response
 
@@ -447,14 +457,16 @@ class AWSSetup:
     response = AWSSetup._generate_apigateway_resource(restApiId, 'uxy-webhook', _apiGateway)
     webhookResourceId = response['id']
 
+    print('WEBHOOK RESOURCE ID: ')
+    print(webhookResourceId)
+
     AWSSetup._add_uxy_webhook_method(restApiId, webhookResourceId, 'POST', lambdaARN, _apiGateway, config)
-    AWSSetup._add_uxy_webhook_method(restApiId, webhookResourceId, 'GET', lambdaARN, _apiGateway, config)
 
     AWSSetup._log('+ Deploying API...')
     response = AWSSetup._deploy_api(restApiId, _apiGateway, config)
     invokeURL = 'https://'+restApiId+'execute-api.'+config['aws:config']['region']+'.amazonaws.com/'+config['app:version']
 
-    AWSSetup._log('==> API Deployed')
+    AWSSetup._log('=> API Deployed')
 
     return {
       'restApiId' : restApiId,

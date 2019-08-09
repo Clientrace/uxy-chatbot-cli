@@ -9,6 +9,7 @@ Project uxy cli command manager module
 
 
 import json
+import boto3
 import click
 from _handlers import setup_handler
 
@@ -28,14 +29,19 @@ def cli():
 
 @cli.command('new')
 @click.argument('appname')
-@click.option('-r','--runtime', default='python', help='application runtime')
+@click.option('-r','--runtime', default='python', help='application runtime', type=click.Choice(['python','go']))
 def new(appname, runtime):
   """
   Creates new project.
   """
 
-  appDesc = click.prompt('Enter Description: ', type=str)
-  setup_handler.__setup_aws_resources(appname, runtime, appDesc)
+  botoSession = boto3.session.Session()
+  default_region = botoSession.region_name
+
+  appDesc = click.prompt('Description ', type=str)
+  stage = click.prompt('Stage ', type=str, default='dev', show_default='dev')
+  region = click.prompt('Region ', type=str, default=default_region, show_default=default_region)
+  setup_handler.__setup_aws_resources(appname, runtime, appDesc, stage, region)
 
 
 # TODO: Uxy Chatbot Component generator
@@ -47,6 +53,10 @@ def generate_component():
 
 if __name__ == '__main__':
   cli()
+
+
+
+
 
 
 

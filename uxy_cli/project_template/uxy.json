@@ -7,12 +7,12 @@
   "aws:config" : {
     "region" : null,
     "dynamodb:session-table" : {
-      "wcu" : null,
-      "rcu" : null
+      "wcu" : 5,
+      "rcu" : 5
     },
-    "lambda:handler" : null,
-    "lambda:timeout" : null,
-    "iam:roles" : [
+    "lambda:handler" : "index.py",
+    "lambda:timeout" : 500,
+    "iam:roles" : [ 
       "arn:aws:iam::aws:policy/AmazonSQSFullAccess",
       "arn:aws:iam::aws:policy/AWSLambdaFullAccess",
       "arn:aws:iam::aws:policy/CloudWatchFullAccess",

@@ -1,0 +1,26 @@
+{
+  "app:name" : null,
+  "app:version" : null,
+  "app:description" : null,
+  "runtime" : null, 
+  "stage" : null, 
+  "aws:config" : {
+    "region" : null,
+    "dynamodb:session-table" : {
+      "wcu" : null,
+      "rcu" : null
+    },
+    "lambda:handler" : null,
+    "lambda:timeout" : null,
+    "iam:roles" : [
+      "arn:aws:iam::aws:policy/AmazonSQSFullAccess",
+      "arn:aws:iam::aws:policy/AWSLambdaFullAccess",
+      "arn:aws:iam::aws:policy/CloudWatchFullAccess",
+      "arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess",
+      "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+    ]
+  },
+  "verbosity" : false
+}
+
+

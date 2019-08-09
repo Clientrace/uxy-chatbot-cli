@@ -81,14 +81,6 @@ class AWSSetup:
     self._apiGateway = boto3.client('apigateway',
      region_name=config['aws:config']['region'])
 
-  @staticmethod
-  def uxy_ascii_art():
-    logo = """\n
-  / __/ _ \/  _/ _ \/ _ \ \/ /  / ___/ /  /  _/
- / _// , _// // // / __ |\  /  / /__/ /___/ /  
-/_/ /_/|_/___/____/_/ |_|/_/   \___/____/___/  
-    """
-    return logo
 
   @classmethod
   def _log(cls, msg):

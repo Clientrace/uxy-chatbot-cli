@@ -25,15 +25,13 @@ def __setup_aws_resources():
   global _appconfig
 
   # Project Setup
-  _projsetup = ProjSetup(_appconfig)
-  _projsetup.
+  # _projsetup = ProjSetup(_appconfig)
 
   # AWS Resource setup
   _awssetup = AWSSetup(_appconfig)
   logging.info('AWS Setup...')
   roleARN = _awssetup.setup_iamrole()
   _awssetup.package_lambda(roleARN)
-  _awssetup.setup_uxy_api()
 
 
 def _setup_(appname, runtime, description, stage, region):

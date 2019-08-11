@@ -3,6 +3,7 @@
 
 import os
 import git
+import json
 
 class ProjSetup:
   """
@@ -10,7 +11,6 @@ class ProjSetup:
 
   # Uxy Chatbot Core Reporsitory http url
   chatbot_core_repo = 'https://github.com/Clientrace/uxy-chatbot-framework.git'
-  appconfig_dir = ''
 
   def __init__(self, config):
     self.config = config
@@ -20,8 +20,9 @@ class ProjSetup:
     """
     Copy app config into newly created project
     """
-
-
+    configFile = open('uxy.json','w')
+    configFile.write(json.dumps(self.config,indent=2,sort_keys=True))
+    configFile.close()
 
   def _clone(self):
     """

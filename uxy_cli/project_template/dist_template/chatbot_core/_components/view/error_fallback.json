@@ -1,9 +1,0 @@
-{
-  "acceptTypes" : ["any"],
-  "content" : ["ERR-00"],
-  "optionType" : "text",
-  "options" : [],
-  "retries" : null
-}
-
-

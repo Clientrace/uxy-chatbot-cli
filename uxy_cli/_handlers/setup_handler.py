@@ -63,6 +63,7 @@ def _setup_(appname, runtime, description, stage, region):
   print('\nCreating project: '+appname+'...')
 
   _appconfig['app:name'] = appname
+  _appconfig['app:version'] = '1'
   _appconfig['app:description'] = description
   _appconfig['app:runtime'] = runtime
   _appconfig['app:stage'] = stage
@@ -70,5 +71,4 @@ def _setup_(appname, runtime, description, stage, region):
 
   _project_setup()
   _aws_setup()
-
 

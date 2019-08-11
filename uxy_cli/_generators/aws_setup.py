@@ -512,7 +512,7 @@ class AWSSetup:
     """
 
     response = AWSSetup._generate_lambda(self.appName, self._lambda, roleARN, self.config)
-    return response['FunctionARN']
+    return response['FunctionArn']
 
   def setup_uxy_api(self, lambdaARN):
     """

@@ -22,7 +22,7 @@ class ProjSetup:
     os.mkdir(self.config['app:name'])
     repo = git.Repo.clone_from(self.chatbot_core_repo, self.config['app:name'])
     repo.remotes.origin.config_writer.set('pushurl','')
-    repo.remotes.origin.config_writer.set('fetchurl','')
+    repo.remotes.origin.config_writer.set('url','')
 
 
 

@@ -44,6 +44,14 @@ def new(appname, runtime):
   setup_handler._setup_(appname, runtime, appDesc, stage, region)
 
 
+@cli.command('purge')
+def purge():
+  """
+  Removes project
+  """
+  pass
+
+
 # TODO: Uxy Chatbot Component generator
 def generate_component():
   pass

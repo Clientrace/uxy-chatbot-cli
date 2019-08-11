@@ -8,6 +8,7 @@ AWS Development Environment Setup
 """
 
 import os
+import time
 import json
 import uuid
 import boto3
@@ -90,11 +91,6 @@ class AWSSetup:
     if( cls.verbosity ):
       print('[AWS]: ' + msg)
 
-  # TODO: save app config to s3 bucket
-  @staticmethod
-  def _save_cloud_config(self):
-    pass
-
 
   @staticmethod
   def _init_table(appName, dynamodb, config):
@@ -107,23 +103,52 @@ class AWSSetup:
     :param config: app configuration
     :param type
     """
+
+    AWSSetup._log(' + Creating dynamodb session table')
+
     sessionTableName = appName+'-uxy-session-'+config['app:stage']
-    dynamodb.create_table(
-      AttributeDefinitions = [{
-        'AttributeName' : 'userID',
-        'AttributeType' : 'S'
-      }],
-      ProvisionedThroughput = {
-        'ReadCapacityUnits' : config['aws:config']['dynamodb:session-table']['wcu'],
-        'WriteCapacityUnits' : config['aws:config']['dynamodb:session-table']['rcu'],
-      },
-      TableName = sessionTableName,
-      KeySchema = [{
-        'AttributeName' : 'userID',
-        'KeyType' : 'HASH'
-      }]
+    try:
+      dynamodb.create_table(
+        AttributeDefinitions = [{
+          'AttributeName' : 'userID',
+          'AttributeType' : 'S'
+        }],
+        ProvisionedThroughput = {
+          'ReadCapacityUnits' : config['aws:config']['dynamodb:session-table']['wcu'],
+          'WriteCapacityUnits' : config['aws:config']['dynamodb:session-table']['rcu'],
+        },
+        TableName = sessionTableName,
+        KeySchema = [{
+          'AttributeName' : 'userID',
+          'KeyType' : 'HASH'
+        }]
+      )
+      AWSSetup._log(' => Table created')
+    except Exception as e:
+      if( '(EntityAlreadyExists)' in str(e) ):
+        AWSSetup._log(' => Table already exist')
+
+  @staticmethod
+  def _save_s3_resource(appName, _s3, contentType, data, config):
+    """
+    """
+    s3BucketName = appName+'-uxy-app-'+config['app:stage']
+    AWSSetup._log('+ Creating s3 bucket... ')
+    _s3.create_bucket(
+      Bucket = s3BucketName,
+      CreateBucketConfiguration = {
+        'LocationConstraint' : config['aws:config']['region']
+      }
     )
 
+    filename = 'aws_blueprint.json'
+    s3Object = _s3.Object(s3BucketName, filename)
+
+    AWSSetup._log('+ Saving app blueprint... ')
+    s3Object.put(
+      ContentType = contentType,
+      Body = data
+    )
 
   @staticmethod
   def _generate_iam_role(appName, _iamClient, _iamRes, config):
@@ -189,7 +214,7 @@ class AWSSetup:
     """
 
     zipf = zipfile.ZipFile(appPackageDest, 'w', zipfile.ZIP_DEFLATED)
-    AWSSetup._log('+ Compressing Template...')
+    AWSSetup._log('+ Compressing Distributable Package...')
     for root, dirs, files in os.walk(appPackageDir):
       for file in files:
         fDir = os.path.join(root, file)
@@ -504,6 +529,13 @@ class AWSSetup:
 
     return response
 
+  def setup_dynamodb_table(self):
+    """
+    Setup dynamodb table
+    """
+
+    AWSSetup._init_table(self.appName, self._dynamodb, self.config)
+
   def package_lambda(self, roleARN):
     """
     Setup AWS Lambda
@@ -525,6 +557,18 @@ class AWSSetup:
 
     response = AWSSetup._generate_uxy_api(self.appName, self._apiGateway, lambdaARN, self.config)
     return response
+
+  def save_cloud_config(self, blueprint):
+    """
+    Save cloud configuration blueprint to s3
+    :param blueprint: cloud resource blueprint
+    :type blueprint: dictionary
+    :returns: aws response
+    :rtype: dictionary
+    """
+    response = AWSSetup._save_s3_resource(self.appName, self._s3, 'text/plain', str(blueprint), self.config)
+    return response
+
 
   def delete_apigateway_rest(self, restApiId):
     """

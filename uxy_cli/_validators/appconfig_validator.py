@@ -46,9 +46,20 @@ class AppConfigValidator:
       if( val not in config.keys()):
         return False
 
+    valid = True
     for val in dictRule.keys():
       if( '_rule' not in dictRule[val] ):
-        return AppConfigValidator._compare_keys(config[val], dictRule[val])
+        if( type(dictRule[val]) == list ):
+          if( type(config[val]) != list ):
+            return False
+          for item in config[val]:
+            valid = AppConfigValidator._compare_keys(item, dictRule[val][0])
+            if( not valid ):
+              return valid
+        else:
+          valid = AppConfigValidator._compare_keys(config[val], dictRule[val])
+          if( not valid ):
+            return valid
     return True
 
   @staticmethod
@@ -87,16 +98,27 @@ class AppConfigValidator:
   @staticmethod
   def _rule_check(config, dictRule):
     for val in dictRule.keys():
-      if('_rule' in dictRule[val]):
+      if( '_rule' in dictRule[val] ):
         valid = AppConfigValidator._rule_validator(val, config[val], dictRule[val]['_rule'])
         if( not valid ):
           return valid
 
+    valid = True
     for val in dictRule.keys():
       if( '_rule' not in dictRule[val] ):
-        return AppConfigValidator._rule_check(config[val], dictRule[val])
+        if( type(dictRule[val]) == list ):
+          if( type(config[val]) != list ):
+            return False
+          for item in config[val]:
+            valid = AppConfigValidator._rule_check(item, dictRule[val][0])
+            if( not valid ):
+              return valid
+        else:
+          valid = AppConfigValidator._rule_check(config[val], dictRule[val])
+          if( not valid ):
+            return valid
 
-    return True
+    return valid
 
 
   def attrib_check(self):

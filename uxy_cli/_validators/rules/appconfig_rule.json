@@ -150,7 +150,7 @@
           }
         }
       },
-      "composer_input_disbled" : {
+      "composer_input_disabled" : {
         "_rule" : {
           "type" : "boolean",
           "value" : {
@@ -184,7 +184,11 @@
         },
         "payload" : {
           "_rule" : {
-
+            "type" : "string",
+            "value" : {
+              "set" : "custom",
+              "type" : "any"
+            }
           }
         }
       }]

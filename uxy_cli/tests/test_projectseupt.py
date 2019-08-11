@@ -22,4 +22,3 @@ class ProjectSetupTest(unittest.TestCase):
     projsetup = ProjSetup(self.appConfig)
     projsetup._clone()
 
-

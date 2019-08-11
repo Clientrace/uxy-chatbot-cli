@@ -18,8 +18,11 @@ class ProjSetup:
     """
     Clone Project Repositry
     """
-    repo = git.Git(os.getcwd()).clone(self.chatbot_core_repo, self.config['app:name'])
-    print(repo)
+
+    os.mkdir(self.config['app:name'])
+    repo = git.Repo.clone_from(self.chatbot_core_repo, self.config['app:name'])
+    repo.remotes.origin.config_writer.set('pushurl','')
+    repo.remotes.origin.config_writer.set('fetchurl','')
 
 
 

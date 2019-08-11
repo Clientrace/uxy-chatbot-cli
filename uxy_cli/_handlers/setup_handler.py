@@ -40,7 +40,8 @@ def _aws_setup():
   awssetup = AWSSetup(_appconfig)
   iamRoleARN = awssetup.setup_iamrole()
   lambdaARN = awssetup.package_lambda(iamRoleARN)
-  awssetup.setup_uxy_api(lambdaARN)
+
+  return awssetup.setup_uxy_api(lambdaARN)
 
 
 def _setup_(appname, runtime, description, stage, region):
@@ -70,5 +71,15 @@ def _setup_(appname, runtime, description, stage, region):
   _appconfig['aws:config']['region'] = region
 
   _project_setup()
-  _aws_setup()
+  apigateway = _aws_setup()
+
+  print('==> Project successfully created!')
+  print('API Invocation URL: '+apigateway['invokeURL'])
+  print('Use this url to integrate with a facebook app.')
+  print('Deploy project with: uxy deploy --[stage]')
+
+
+
+
+
 

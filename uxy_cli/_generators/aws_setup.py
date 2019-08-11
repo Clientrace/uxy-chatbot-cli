@@ -46,8 +46,6 @@ class AWSSetup:
   """
 
   verbosity = False
-  zipPackageDir = '.tmp/dist.zip'
-  uxyTemplateDir = 'uxy_cli/project_template/dist_template/'
 
   # Lambda Function Vars
   FUNCTION_NOT_FOUND = 0
@@ -109,7 +107,7 @@ class AWSSetup:
     :param config: app configuration
     :param type
     """
-    sessionTableName = appName+'-uxy-session-'+config[app:stage]
+    sessionTableName = appName+'-uxy-session-'+config['app:stage']
     dynamodb.create_table(
       AttributeDefinitions = [{
         'AttributeName' : 'userID',
@@ -252,13 +250,14 @@ class AWSSetup:
     :rtype: dictionary
     """
 
-    funcName = appName+'-uxy-app-'+config[app:stage]
+    os.mkdir(config['app:name']+'/.tmp')
+    funcName = appName+'-uxy-app-'+config['app:stage']
     AWSSetup._compress_app_package(
-      AWSSetup.uxyTemplateDir,
-      AWSSetup.zipPackageDir
+      config['app:name'],
+      config['app:name']+'/.tmp/dist.zip'
     )
 
-    zipFile = open(AWSSetup.zipPackageDir,'rb')
+    zipFile = open(config['app:name']+'/.tmp/dist.zip', 'rb')
     zipFileBin = zipFile.read()
     zipFile.close()
 
@@ -374,7 +373,7 @@ class AWSSetup:
     :returns: aws response
     :rtype: dictionary
     """
-    apiName = appName+'-uxy-app-'+config[app:stage]
+    apiName = appName+'-uxy-app-'+config['app:stage']
     response = _apiGateway.create_rest_api(
       name = apiName,
       description = config['app:description'],
@@ -449,9 +448,6 @@ class AWSSetup:
     response = AWSSetup._generate_apigateway_resource(restApiId, 'uxy-webhook', _apiGateway)
     webhookResourceId = response['id']
 
-    print('WEBHOOK RESOURCE ID: ')
-    print(webhookResourceId)
-
     AWSSetup._add_uxy_webhook_method(restApiId, webhookResourceId, 'POST', lambdaARN, _apiGateway, config)
 
     AWSSetup._log('+ Deploying API...')
@@ -516,7 +512,7 @@ class AWSSetup:
     """
 
     response = AWSSetup._generate_lambda(self.appName, self._lambda, roleARN, self.config)
-    return response
+    return response['FunctionARN']
 
   def setup_uxy_api(self, lambdaARN):
     """

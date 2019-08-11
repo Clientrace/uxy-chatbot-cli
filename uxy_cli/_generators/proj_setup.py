@@ -4,6 +4,7 @@
 import os
 import git
 import json
+import shutil
 
 class ProjSetup:
   """
@@ -16,20 +17,26 @@ class ProjSetup:
     self.config = config
 
 
+  def log(self, msg):
+    if( self.config['verbosity'] ):
+      print('[SETUP] : '+msg)
+
+
   def _add_app_config(self):
     """
     Copy app config into newly created project
     """
-    configFile = open('uxy.json','w')
+    configFile = open(self.config['app:name']+'/uxy.json','w')
     configFile.write(json.dumps(self.config,indent=2,sort_keys=True))
     configFile.close()
+
 
   def _clone(self):
     """
     Clone Project Repositry
     """
-
-    os.mkdir(self.config['app:name'])
+    self.log('Cloning project..')
+    self.log('Cloning Uxy Chatbot Framework: '+self.chatbot_core_repo)
     repo = git.Repo.clone_from(self.chatbot_core_repo, self.config['app:name'])
     repo.remotes.origin.config_writer.set('pushurl','')
     repo.remotes.origin.config_writer.set('url','')

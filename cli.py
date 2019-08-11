@@ -14,7 +14,7 @@ import click
 from uxy_cli._handlers import setup_handler
 
 global appinfo
-appinfo = json.loads(open('cli.json').read())
+appinfo = json.loads(open('uxy_cli/cli.json').read())
 
 @click.group()
 def cli():
@@ -41,8 +41,7 @@ def new(appname, runtime):
   appDesc = click.prompt('Description ', type=str)
   stage = click.prompt('Stage ', type=str, default='dev', show_default='dev')
   region = click.prompt('Region ', type=str, default=default_region, show_default=default_region)
-  setup_handler._setup(appname, runtime, appDesc, stage, region)
-  setup_handler.__setup_aws_resources(appname, runtime, appDesc, stage, region)
+  setup_handler._setup_(appname, runtime, appDesc, stage, region)
 
 
 # TODO: Uxy Chatbot Component generator

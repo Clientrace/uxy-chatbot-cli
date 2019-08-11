@@ -16,22 +16,31 @@ global _appconfig
 global _awssetup
 global _projsetup
 
-logging.basicConfig(level=logging.INFO)
+_appconfig = json.loads(open('uxy_cli/project_template/uxy.json').read())
 
-_appconfig = json.loads(open('project_template/uxy.json').read())
+def _project_setup():
+  """
+  Initial Project Setup
+  """
 
-# TODO: Setup AWS Resources
-def __setup_aws_resources():
+  global _appconfig
+  print('Loading project...')
+  projsetup = ProjSetup(_appconfig)
+  projsetup._clone()
+  projsetup._add_app_config()
+
+def _aws_setup():
+  """
+  AWS Resource setup
+  """
+
   global _appconfig
 
-  # Project Setup
-  # _projsetup = ProjSetup(_appconfig)
-
-  # AWS Resource setup
-  _awssetup = AWSSetup(_appconfig)
-  logging.info('AWS Setup...')
-  roleARN = _awssetup.setup_iamrole()
-  _awssetup.package_lambda(roleARN)
+  print('Creating AWS Resources...')
+  awssetup = AWSSetup(_appconfig)
+  iamRoleARN = awssetup.setup_iamrole()
+  lambdaARN = awssetup.package_lambda(iamRoleARN)
+  awssetup.setup_uxy_api(lambdaARN)
 
 
 def _setup_(appname, runtime, description, stage, region):
@@ -51,11 +60,7 @@ def _setup_(appname, runtime, description, stage, region):
 
   global _appconfig
 
-  logging.info('APPNAME: '+appname)
-  logging.info('RUNTIME: '+runtime)
-  logging.info('DESCRIPTION: '+description)
-  logging.info('REGION: '+description)
-  logging.info('Loading application config template...')
+  print('\nCreating project: '+appname+'...')
 
   _appconfig['app:name'] = appname
   _appconfig['app:description'] = description
@@ -63,11 +68,7 @@ def _setup_(appname, runtime, description, stage, region):
   _appconfig['app:stage'] = stage
   _appconfig['aws:config']['region'] = region
 
-
-
-
-
-
-
+  _project_setup()
+  _aws_setup()
 
 

@@ -38,20 +38,19 @@ class AWSSetupTest(unittest.TestCase):
 
 
 
-  @unittest.skip('Skip')
   def test_package_compression(self):
     """
     Test Zip compressor
     """
-    appPackageDir = 'uxy_cli/project_template'
-    appPackageDest = '.tmp/test.zip'
+    appPackageDir = 'my-chatbot-project/'
+    appPackageDest = 'my-chatbot-project/.tmp/dist.zip'
 
     # Removes Initial File
     if( os.path.isfile(appPackageDest) ):
       os.remove(appPackageDest)
     AWSSetup._compress_app_package(appPackageDir, appPackageDest)
     self.assertTrue( os.path.isfile(appPackageDest) )
-    os.remove(appPackageDest)
+    # os.remove(appPackageDest)
 
 
   @unittest.skip('Skip')
@@ -79,6 +78,7 @@ class AWSSetupTest(unittest.TestCase):
     awsSetup.remove_iamrole('testbot-uxy-app')
     awsSetup.remove_lambda('testbot-uxy-app')
 
+  @unittest.skip('temporary')
   def test_apigateway_create_rest(self):
     """
     Test API Gateway Rest API Generator

@@ -64,11 +64,6 @@ class AppConfigValidator:
         print('[ AppConfig Error ]: '+field+' value must be boolean')
         return False
 
-    if( rule['value']['set'] == 'predefined' ):
-      if( val not in rule['value']['lists'] ):
-        print('[ AppConfig Error ]: '+field+' should be of the following values: '+str(rule['value']['lists']))
-        return False
-
     if( rule['type'] == 'string' ):
       val = val.strip()
       if( type(val) != str ):
@@ -80,6 +75,10 @@ class AppConfigValidator:
       if( rule['value']['type'] == 'numeric' ):
         if( not val.isdigit() ):
           print('[ AppConfig Error ]: '+field+' value should be numeric')
+          return False
+      if( rule['value']['set'] == 'predefined' ):
+        if( val not in rule['value']['lists'] ):
+          print('[ AppConfig Error ]: '+field+' should be of the following values: '+str(rule['value']['lists']))
           return False
 
     return True

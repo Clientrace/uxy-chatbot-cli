@@ -2,8 +2,16 @@
   "app:name" : null,
   "app:version" : null,
   "app:description" : null,
-  "runtime" : null, 
-  "stage" : null, 
+  "app:runtime" : null, 
+  "app:stage" : null, 
+  "app:config" : {
+    "prod" : {
+      "fileReplacements" : {
+        "replace" : "uxy_app/configurations/environment.ts",
+        "with" : "uxy_app/configurations/environment.prod.ts"
+      }
+    }
+  },
   "aws:config" : {
     "region" : null,
     "dynamodb:session-table" : {
@@ -20,7 +28,32 @@
       "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
     ]
   },
+  "chatbot:config": {
+    "URLsToWhitelist" : [],
+    "persistent_menu" : {
+      "locale" : "default",
+      "composer_input_disabled" : false,
+      "call_to_actions" : [
+        {
+          "type" : "postback",
+          "title" : "OPTION-1",
+          "payload" : "PERSIST_OPTION-1"
+        },
+        {
+          "type" : "postback",
+          "title" : "OPTION-2",
+          "payload" : "PERSIST_OPTION-2"
+        },
+        {
+          "type" : "postback",
+          "title" : "OPTION-3",
+          "payload" : "PERSIST_OPTION-3"
+        }
+      ]
+    }
+  },
   "verbosity" : false
 }
+
 
 

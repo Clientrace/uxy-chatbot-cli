@@ -10,9 +10,18 @@ class ProjSetup:
 
   # Uxy Chatbot Core Reporsitory http url
   chatbot_core_repo = 'https://github.com/Clientrace/uxy-chatbot-framework.git'
+  appconfig_dir = ''
 
   def __init__(self, config):
     self.config = config
+
+
+  def _add_app_config(self):
+    """
+    Copy app config into newly created project
+    """
+
+
 
   def _clone(self):
     """

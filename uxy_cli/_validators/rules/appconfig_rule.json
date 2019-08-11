@@ -26,7 +26,7 @@
       }
     }
   },
-  "runtime": {
+  "app:runtime": {
     "_rule": {
       "type": "string",
       "value": {
@@ -39,12 +39,27 @@
       }
     }
   },
-  "stage": {
+  "app:stage": {
     "_rule": {
       "type": "string",
       "value": {
         "set": "custom",
         "type": "any"
+      }
+    }
+  },
+  "app:config" : {
+    "prod" : {
+      "fileReplacements" : {
+        "replace" : {
+          "_rule" : {
+            "type" : "string",
+            "value" : {
+              "set" : "custom",
+              "type" : "any"
+            }
+          }
+        }
       }
     }
   },
@@ -113,6 +128,66 @@
           "type": "numeric"
         }
       }
+    }
+  },
+  "chatbot:config" : {
+    "URLsToWhiteList" : {
+      "_rule" : {
+        "type" : "list",
+        "value" : {
+          "set" : "custom",
+          "type" : "any"
+        }
+      }
+    },
+    "persistent_menu" : {
+      "locale" : {
+        "_rule" : {
+          "type" : "string",
+          "value" : {
+            "set" : "custom",
+            "type" :"any"
+          }
+        }
+      },
+      "composer_input_disbled" : {
+        "_rule" : {
+          "type" : "boolean",
+          "value" : {
+            "set" : "custom",
+            "type" : "boolean"
+          }
+        }
+      },
+      "call_to_actions" : [{
+        "type" : {
+          "_rule" : {
+            "type" : "string",
+            "value" : {
+              "set" : "predefined",
+              "type" : "any",
+              "lists" : [
+                "postback",
+                "web_url"
+              ]
+            }
+          }
+        },
+        "title" : {
+          "_rule" : {
+            "type" : "string",
+            "value" : {
+              "set" : "custom",
+              "type" : "any"
+            }
+          }
+        },
+        "payload" : {
+          "_rule" : {
+
+          }
+        }
+      }]
     }
   },
   "verbosity": {

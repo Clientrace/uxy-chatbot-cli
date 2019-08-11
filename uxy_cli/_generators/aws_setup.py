@@ -20,9 +20,9 @@ class AWSSetup:
   {
     'app:name' : <app-name>,
     'app:version' : <app-version>,
-    'description' : <app-description>,
-    'runtime' : 'python3.6',
-    'stage' : <environment stage>,
+    'app:description' : <app-description>,
+    'app:runtime' : 'python3.6',
+    'app:stage' : <environment stage>,
     'aws:config' : {
       'dynamodb:session-table' : {
         'wcu' : 5,
@@ -109,7 +109,7 @@ class AWSSetup:
     :param config: app configuration
     :param type
     """
-    sessionTableName = appName+'-uxy-session-'+config['stage']
+    sessionTableName = appName+'-uxy-session-'+config[app:stage]
     dynamodb.create_table(
       AttributeDefinitions = [{
         'AttributeName' : 'userID',
@@ -252,7 +252,7 @@ class AWSSetup:
     :rtype: dictionary
     """
 
-    funcName = appName+'-uxy-app-'+config['stage']
+    funcName = appName+'-uxy-app-'+config[app:stage]
     AWSSetup._compress_app_package(
       AWSSetup.uxyTemplateDir,
       AWSSetup.zipPackageDir
@@ -265,9 +265,9 @@ class AWSSetup:
     statusCode = AWSSetup._function_exists(funcName, _lambda)
     if( statusCode == AWSSetup.FUNCTION_NOT_FOUND ):
       runtime = None
-      if( config['runtime'] == 'go' ):
+      if( config['app:runtime'] == 'go' ):
         runtime = 'go1.x'
-      if( config['runtime'] == 'python' ):
+      if( config['app:runtime'] == 'python' ):
         runtime = 'python3.6'
 
       AWSSetup._log('+ Creating lambda function...')
@@ -374,7 +374,7 @@ class AWSSetup:
     :returns: aws response
     :rtype: dictionary
     """
-    apiName = appName+'-uxy-app-'+config['stage']
+    apiName = appName+'-uxy-app-'+config[app:stage]
     response = _apiGateway.create_rest_api(
       name = apiName,
       description = config['app:description'],

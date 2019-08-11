@@ -46,8 +46,8 @@ class AWSSetup:
   """
 
   verbosity = False
-  zipPackageDir = '.tmp/fri.zip'
-  uxyTemplateDir = 'uxy_cli/project_template'
+  zipPackageDir = '.tmp/dist.zip'
+  uxyTemplateDir = 'uxy_cli/project_template/dist_template/'
 
   # Lambda Function Vars
   FUNCTION_NOT_FOUND = 0

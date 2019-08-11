@@ -21,7 +21,7 @@ var/
 *.egg
 
 # Uxy Generated Files
-fri.zip
+dist.zip
 
 # Serverless directories
 .serverless

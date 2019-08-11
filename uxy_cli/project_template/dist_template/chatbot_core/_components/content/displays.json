@@ -1,0 +1,29 @@
+{
+  "ERR-00" : {
+    "description" : "Internal Code Error",
+    "data" : "Something went wrong.",
+    "delay" : 0
+  },
+  "ERR-01" : {
+    "description" : "fallback response",
+    "data" : "Sorry, I did not get what you mean.",
+    "delay" : 0
+  },
+  "ERR-02" : {
+    "description" : "User selected option doesn't match the provided set of options",
+    "data" : "Please choose from the options provided:",
+    "delay" : 0
+  },
+  "FS-01" : {
+    "description" : "Welcome, Initial message",
+    "data" : [
+      "Hi :firstname:! I'm :botname:, nice to meet you!",
+      "Hello, I'm :botname:. What can I do for you?"
+    ],
+    "delay" : 0
+  }
+}
+
+
+
+

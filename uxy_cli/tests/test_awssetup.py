@@ -1,7 +1,6 @@
 """
 Authored By Kim Clarence Penaflor
 08/06/2019
-version 0.0.1
 
 AWSSetup Test
 """

@@ -150,7 +150,7 @@ class AWSSetup:
     :type config: dictionary
     """
 
-    s3BucketName = appname+'-uxy-app-'+config['app:stage']
+    s3BucketName = appName+'-uxy-app-'+config['app:stage']
     s3Object = _s3.Object(s3BucketName, resourceName)
     content = s3Object.get()['Body'].read().decode('utf-8')
     return content

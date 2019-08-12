@@ -48,7 +48,9 @@ class AWSSetup:
      region_name=config['aws:config']['region'])
     self._lambda = boto3.client('lambda',
      region_name=config['aws:config']['region'])
-    self._dynamodb = boto3.resource('dynamodb',
+    self._dynamodbRes = boto3.resource('dynamodb',
+     region_name=config['aws:config']['region'])
+    self._dynamodbClient = boto3.client('dynamodb',
      region_name=config['aws:config']['region'])
     self._apiGateway = boto3.client('apigateway',
      region_name=config['aws:config']['region'])
@@ -539,13 +541,13 @@ class AWSSetup:
     Setup dynamodb table
     """
 
-    AWSSetup._init_table(self.appName, self._dynamodb, self.config)
+    AWSSetup._init_table(self.appName, self._dynamodbRes, self.config)
 
   def remove_dynamodb_table(self, tableName):
     """
     Remove uxy session table
     """
-    response = self._dynamodb.delete_table(
+    response = self._dynamodbClient.delete_table(
       TableName = tableName
     )
 
@@ -580,7 +582,7 @@ class AWSSetup:
     :returns: aws response
     :rtype: dictionary
     """
-    response = AWSSetup._save_s3_resource(self.appName, self._s3, 'text/plain', str(blueprint), self.config)
+    response = AWSSetup._save_s3_resource(self.appName, self._s3, 'text/plain', json.dumps(blueprint, indent=2), self.config)
     return response
 
   def load_cloud_config(self):
@@ -607,6 +609,32 @@ class AWSSetup:
       restApiId = restApiId
     )
     return response
+
+  def detach_iam_policy(self, roleName, policies):
+    """
+    Detach list of policies in iamrole
+    :param roleName: name of role to be detach
+    :type roleName: string
+    :param policies: list of policy arn
+    :type policies: string list
+    """
+    for policy in policies:
+      self._iamClient.detach_role_policy(
+        RoleName = roleName,
+        PolicyArn = policy
+      )
+
+
+  def delete_s3_bucket(self, bucketName):
+    """
+    Delete s3 bucket
+    :param bucketName: name of s3 bucket
+    :type bucketName: string
+    """
+
+    self._s3.delete_bucket(
+      Bucket = bucketName
+    )
 
 
 

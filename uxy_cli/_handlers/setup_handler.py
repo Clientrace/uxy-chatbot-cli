@@ -75,6 +75,7 @@ def _aws_setup():
   restApi = awssetup.setup_uxy_api(lambdaARN)
   _save_project_blueprint('restApi:id', restApi['restApiId'])
 
+  _save_project_blueprint('s3:name', _appconfig['app:name']+'-uxy-app-'+_appconfig['app:stage'])
   awssetup.save_cloud_config(_projectBlueprint)
 
   return restApi
@@ -109,6 +110,7 @@ def _setup_(appname, runtime, description, stage, region):
 
   _save_project_blueprint('app:name', appname)
   _save_project_blueprint('app:region', region)
+  _save_project_blueprint('iam:roles', _appconfig['aws:config']['iam:roles'])
 
   _project_setup()
   apigateway = _aws_setup()

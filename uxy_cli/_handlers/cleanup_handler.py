@@ -4,7 +4,7 @@ Authored by Kim Clarence Penaflor
 version 0.0.2
 Documented via reST
 
-Project uxy cli clueanup handler module
+Project uxy cli cleanup handler module
 """
 
 import json
@@ -25,9 +25,11 @@ def __remove_dynamodb(awssetup, cloudBlueprint):
 def __remove_iamRole(awssetup, cloudBlueprint):
   print('Removing Iam Role...')
   try:
+    awssetup.detach_iam_policy(cloudBlueprint['iam:name'],cloudBlueprint['iam:roles'])
     awssetup.remove_iamrole(cloudBlueprint['iam:name'])
     AWSSetup._log('=> IAM Role deleted')
   except Exception as e:
+    print(str(e))
     if( '(ResourceNotFoundException)' in str(e) ):
       AWSSetup._log('=> IAM Role already deleted')
 
@@ -49,7 +51,21 @@ def __remove_lambda_function(awssetup, cloudBlueprint):
     if( '(ResourceNotFoundException)' in str(e) ):
       AWSSetup._log('=> Lambda function already Deleted.')
 
+def __remove_s3_bucket(awssetup, cloudBlueprint):
+  print('Removing s3 bucket...')
+  try:
+    awssetup.__remove_s3_bucket(cloudBlueprint['s3:name'])
+    AWSSetup._log('=> s3 bucket deleted.')
+  except Exception as e:
+    if( '(ResourceNotFoundException)' in str(e) ):
+      AWSSetup._log('=> s3 bucket already deleted.')
+
+
 def purge():
+  """
+  Purge uxy chatbot
+  """
+
   if( not os.path.isfile('uxy.json') ):
     print('Failed to locate app configuration file..')
   else:
@@ -64,11 +80,12 @@ def purge():
       __remove_apiGateway(awssetup, cloudBlueprint)
       __remove_lambda_function(awssetup, cloudBlueprint)
     except Exception as e:
+      print(str(e))
       print('Failed to load cloud blueprint.')
       print('Try manually removing AWS resources.')
 
     print('Removing project files...')
-    os.remove('.')
+    os.chdir('../')
+    shutil.rmtree(appConfig['app:name'])
     print('=> Project removed.')
-
 

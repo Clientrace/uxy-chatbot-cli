@@ -14,6 +14,7 @@ import click
 import uxy_cli
 from uxy_cli._handlers import setup_handler
 from uxy_cli._handlers import cleanup_handler
+from uxy_cli._handlers import deployment_handler
 
 @click.group()
 def cli():
@@ -51,6 +52,16 @@ def purge():
 
   if(click.confirm('Are you sure you want to remove the project and its resources?')):
     cleanup_handler.purge()
+
+
+@cli.command('deploy')
+def deploy():
+  """
+  Deploy chatbot project
+  """
+  pass
+
+
 
 # TODO: Uxy Chatbot Component generator
 def generate_component():

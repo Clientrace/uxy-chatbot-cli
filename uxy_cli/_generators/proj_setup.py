@@ -12,7 +12,9 @@ class ProjSetup:
   """
 
   # Uxy Chatbot Core Reporsitory http url
-  chatbot_core_repo = 'https://github.com/Clientrace/uxy-chatbot-framework.git'
+  chatbot_core_repo = {
+    'python' : 'https://github.com/Clientrace/uxy-framework-python.git'
+  }
 
   def __init__(self, config):
     self.config = config
@@ -38,7 +40,7 @@ class ProjSetup:
     """
     self.log('Cloning project..')
     self.log('Cloning Uxy Chatbot Framework: '+self.chatbot_core_repo)
-    repo = git.Repo.clone_from(self.chatbot_core_repo, self.config['app:name'])
+    repo = git.Repo.clone_from(self.chatbot_core_repo[self.config['app:runtime']], self.config['app:name'])
     repo.remotes.origin.config_writer.set('pushurl','')
     repo.remotes.origin.config_writer.set('url','')
 

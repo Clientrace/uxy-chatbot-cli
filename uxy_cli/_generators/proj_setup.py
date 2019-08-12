@@ -39,7 +39,7 @@ class ProjSetup:
     Clone Project Repositry
     """
     self.log('Cloning project..')
-    self.log('Cloning Uxy Chatbot Framework: '+self.chatbot_core_repo)
+    self.log('Cloning Uxy Chatbot Framework: '+self.chatbot_core_repo['app:runtime'])
     repo = git.Repo.clone_from(self.chatbot_core_repo[self.config['app:runtime']], self.config['app:name'])
     repo.remotes.origin.config_writer.set('pushurl','')
     repo.remotes.origin.config_writer.set('url','')

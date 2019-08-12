@@ -11,11 +11,9 @@ Project uxy cli command manager module
 import json
 import boto3
 import click
+import uxy_cli
 from uxy_cli._handlers import setup_handler
 from uxy_cli._handlers import cleanup_handler
-
-global appinfo
-appinfo = json.loads(open('uxy_cli/cli.json').read())
 
 @click.group()
 def cli():

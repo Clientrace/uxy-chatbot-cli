@@ -7,10 +7,13 @@ Documented via reST
 Project uxy cli setup command manager module
 """
 
+import os
 import json
+import uxy_cli
 from uxy_cli._generators.aws_setup import AWSSetup
 from uxy_cli._generators.proj_setup import ProjSetup
 
+global ROOT_DIR
 global _appconfig
 global _awssetup
 global _projsetup
@@ -25,7 +28,6 @@ def _project_setup():
 
   global _appconfig
 
-  _appconfig = json.loads(open('uxy_cli/project_template/uxy.json').read())
   print('Loading project...')
   projsetup = ProjSetup(_appconfig)
   projsetup._clone()
@@ -89,6 +91,7 @@ def _setup_(appname, runtime, description, stage, region):
   """
 
   global _appconfig
+  _appconfig = json.loads(open(uxy_cli.ROOT_DIR+'/project_template/uxy.json').read())
 
   print('\nCreating project: '+appname+'...')
 

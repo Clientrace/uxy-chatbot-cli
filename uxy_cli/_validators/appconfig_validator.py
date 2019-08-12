@@ -7,6 +7,7 @@ Application configuration validator
 """
 
 import json
+import uxy_cli
 
 
 class AppConfigValidator:
@@ -14,7 +15,7 @@ class AppConfigValidator:
   """
 
   # App config file validation rule:
-  validationRule = json.loads(open('uxy_cli/_validators/rules/appconfig_rule.json').read())
+  validationRule = json.loads(open(uxy_cli.ROOT_DIR+'/_validators/rules/appconfig_rule.json').read())
 
   def __init__(self, appConfig):
     """

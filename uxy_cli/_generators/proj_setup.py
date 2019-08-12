@@ -5,6 +5,7 @@ import os
 import git
 import json
 import shutil
+import uxy_cli
 
 class ProjSetup:
   """

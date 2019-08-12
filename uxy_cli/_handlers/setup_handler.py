@@ -4,11 +4,10 @@ Authored by Kim Clarence Penaflor
 version 0.0.2
 Documented via reST
 
-Project uxy cli command manager module
+Project uxy cli setup command manager module
 """
 
 import json
-import logging
 from uxy_cli._generators.aws_setup import AWSSetup
 from uxy_cli._generators.proj_setup import ProjSetup
 
@@ -17,7 +16,6 @@ global _awssetup
 global _projsetup
 global _projectBlueprint
 
-_appconfig = json.loads(open('uxy_cli/project_template/uxy.json').read())
 _projectBlueprint = {}
 
 def _project_setup():
@@ -26,6 +24,8 @@ def _project_setup():
   """
 
   global _appconfig
+
+  _appconfig = json.loads(open('uxy_cli/project_template/uxy.json').read())
   print('Loading project...')
   projsetup = ProjSetup(_appconfig)
   projsetup._clone()

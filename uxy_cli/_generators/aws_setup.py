@@ -17,33 +17,6 @@ import zipfile
 class AWSSetup:
   """
   AWS Setup Manager
-  APP Config File blueprint:
-  {
-    'app:name' : <app-name>,
-    'app:version' : <app-version>,
-    'app:description' : <app-description>,
-    'app:runtime' : 'python3.6',
-    'app:stage' : <environment stage>,
-    'aws:config' : {
-      'dynamodb:session-table' : {
-        'wcu' : 5,
-        'rcu' : 5
-      },
-      'dynamodb:auth-table' : {
-        'wcu' : 5,
-        'rcu' : 5
-      },
-      'lambda:handler' : 'index.lambda_handler',
-      'lambda:timeout' : 900,
-      'iam:roles' : [
-        <role1>,
-        <role2>
-        <role3>
-      ]
-    },
-
-    'verbosity' : false 
-  }
   """
 
   verbosity = False
@@ -101,7 +74,7 @@ class AWSSetup:
     :param dynamodb: aws dynamodb instance
     :param type: boto3 object
     :param config: app configuration
-    :param type
+    :type config: dictionary
     """
 
     AWSSetup._log(' + Creating dynamodb session table')
@@ -126,20 +99,34 @@ class AWSSetup:
       AWSSetup._log(' => Table created')
     except Exception as e:
       if( '(EntityAlreadyExists)' in str(e) ):
-        AWSSetup._log(' => Table already exist')
+        AWSSetup._log('=> Table already exist')
 
   @staticmethod
   def _save_s3_resource(appName, _s3, contentType, data, config):
     """
+    Creates bucket and saves s3 resource data
+    :param appName: application name
+    :type appName: string
+    :param _s3: aws s3 instance
+    :type _s3: boto3 object
+    :param data: data to save
+    :type data: any
+    :param config: app configuration
+    :type config: dictionary
     """
     s3BucketName = appName+'-uxy-app-'+config['app:stage']
     AWSSetup._log('+ Creating s3 bucket... ')
-    _s3.create_bucket(
-      Bucket = s3BucketName,
-      CreateBucketConfiguration = {
-        'LocationConstraint' : config['aws:config']['region']
-      }
-    )
+    try:
+      _s3.create_bucket(
+        Bucket = s3BucketName,
+        CreateBucketConfiguration = {
+          'LocationConstraint' : config['aws:config']['region']
+        }
+      )
+    except Exception as e:
+      if( '(EntityAlreadyExists)' in str(e) ):
+        AWSSetup._log('=> Bucket already exist')
+
 
     filename = 'aws_blueprint.json'
     s3Object = _s3.Object(s3BucketName, filename)
@@ -149,6 +136,24 @@ class AWSSetup:
       ContentType = contentType,
       Body = data
     )
+
+  @staticmethod
+  def _load_s3_text_resource(appName, _s3, resourceName, config):
+    """
+    :param appName: application name
+    :type appName: string
+    :param _s3: aws s3 instance
+    :type _s3: boto3 object
+    :param resourceName: resource to read
+    :type resourceName: string
+    :param config: app configuration
+    :type config: dictionary
+    """
+
+    s3BucketName = appname+'-uxy-app-'+config['app:stage']
+    s3Object = _s3.Object(s3BucketName, resourceName)
+    content = s3Object.get()['Body'].read().decode('utf-8')
+    return content
 
   @staticmethod
   def _generate_iam_role(appName, _iamClient, _iamRes, config):
@@ -569,6 +574,14 @@ class AWSSetup:
     response = AWSSetup._save_s3_resource(self.appName, self._s3, 'text/plain', str(blueprint), self.config)
     return response
 
+  def load_cloud_config(self):
+    """
+    Load cloud configuration file as json
+    """
+    AWSSetup._log('Loading cloud blueprint...')
+    content = AWSSetup._load_s3_text_resource(self.appName, self._s3, 'aws_blueprint.json', self.config)
+    return json.loads(content)
+
 
   def delete_apigateway_rest(self, restApiId):
     """
@@ -585,5 +598,7 @@ class AWSSetup:
       restApiId = restApiId
     )
     return response
+
+
 
 

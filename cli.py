@@ -12,6 +12,7 @@ import json
 import boto3
 import click
 from uxy_cli._handlers import setup_handler
+from uxy_cli._handlers import cleanup_handler
 
 global appinfo
 appinfo = json.loads(open('uxy_cli/cli.json').read())
@@ -49,21 +50,17 @@ def purge():
   """
   Removes project
   """
-  pass
 
+  if(click.confirm('Are you sure you want to remove the project and its resources?')):
+    cleanup_handler.purge()
 
 # TODO: Uxy Chatbot Component generator
 def generate_component():
   pass
 
 
-
-
 if __name__ == '__main__':
   cli()
-
-
-
 
 
 

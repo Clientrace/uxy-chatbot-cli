@@ -7,6 +7,7 @@ Documented via reST
 Project uxy cli setup command manager module
 """
 
+import time
 import os
 import json
 import uxy_cli
@@ -62,6 +63,10 @@ def _aws_setup():
 
   iamRoleARN = awssetup.setup_iamrole()
   _save_project_blueprint('iam:arn', iamRoleARN)
+  _save_project_blueprint('iam:name', _appconfig['app:name']+'-uxy-app')
+
+  # Sleep for 5 seconds, will till iamRole is created
+  time.sleep(5)
 
   lambdaARN = awssetup.package_lambda(iamRoleARN)
   _save_project_blueprint('lambda:arn', lambdaARN)
@@ -114,7 +119,5 @@ def _setup_(appname, runtime, description, stage, region):
   print('API Invocation URL: '+apigateway['invokeURL'])
   print('Use this url to integrate with a facebook app.')
   print('Deploy project with: uxy deploy --[stage]')
-
-
 
 

@@ -77,7 +77,7 @@ class AWSSetup:
     :type config: dictionary
     """
 
-    AWSSetup._log(' + Creating dynamodb session table')
+    AWSSetup._log('+ Creating dynamodb session table')
 
     sessionTableName = appName+'-uxy-session-'+config['app:stage']
     try:
@@ -96,7 +96,7 @@ class AWSSetup:
           'KeyType' : 'HASH'
         }]
       )
-      AWSSetup._log(' => Table created')
+      AWSSetup._log('=> Table created')
     except Exception as e:
       if( '(EntityAlreadyExists)' in str(e) ):
         AWSSetup._log('=> Table already exist')
@@ -482,7 +482,7 @@ class AWSSetup:
 
     AWSSetup._log('+ Deploying API...')
     response = AWSSetup._deploy_api(restApiId, _apiGateway, config)
-    invokeURL = 'https://'+restApiId+'execute-api.'+config['aws:config']['region']+'.amazonaws.com/'+config['app:version']
+    invokeURL = 'https://'+restApiId+'execute-api.'+config['aws:config']['region']+'.amazonaws.com/v'+config['app:version']+'/uxy-webhook'
 
     AWSSetup._log('=> API Deployed')
 
@@ -540,6 +540,15 @@ class AWSSetup:
     """
 
     AWSSetup._init_table(self.appName, self._dynamodb, self.config)
+
+  def remove_dynamodb_table(self, tableName):
+    """
+    Remove uxy session table
+    """
+    response = self._dynamodb.delete_table(
+      TableName = tableName
+    )
+
 
   def package_lambda(self, roleARN):
     """

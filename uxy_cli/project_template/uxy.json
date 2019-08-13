@@ -5,11 +5,21 @@
   "app:runtime" : null, 
   "app:stage" : null, 
   "app:config" : {
+    "dev" : {
+      "fileReplacements" : [
+        {
+          "replace" : "_uxy_core/src/env/environment.cfg",
+          "with" : "_uxy_core/src/env/environment.dev.cfg"
+        }
+      ]
+    },
     "prod" : {
-      "fileReplacements" : {
-        "replace" : "uxy_app/configurations/environment.ts",
-        "with" : "uxy_app/configurations/environment.prod.ts"
-      }
+      "fileReplacements" : [
+        {
+          "replace" : "_uxy_core/src/env/environment.cfg",
+          "with" : "_uxy_core/src/env/environment.prod.cfg"
+        }
+     ]
     }
   },
   "aws:config" : {

@@ -49,8 +49,8 @@
     }
   },
   "app:config" : {
-    "prod" : {
-      "fileReplacements" : {
+    "dev" : {
+      "fileReplacements" : [{
         "replace" : {
           "_rule" : {
             "type" : "string",
@@ -60,7 +60,7 @@
             }
           }
         }
-      }
+      }]
     }
   },
   "aws:config": {

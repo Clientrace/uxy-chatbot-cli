@@ -55,10 +55,12 @@ def purge():
 
 
 @cli.command('deploy')
-def deploy():
+@cli.option('-s','--stage')
+def deploy(stage):
   """
   Deploy chatbot project
   """
+
   pass
 
 

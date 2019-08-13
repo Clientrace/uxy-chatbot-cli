@@ -14,6 +14,14 @@ from uxy_cli._generators.aws_setup import AWSSetup
 
 
 def __remove_dynamodb(awssetup, cloudBlueprint):
+  """
+  Remove AWS Dynamodb Resource
+  :param awssetup: Aws Setup Manager
+  :type awssetup: AWSSetup Object
+  :param cloudBlueprint: Amazon resources names and IDs
+  :type cloudBlueprint: json (dictionary)
+  """
+
   print('Removing Dynamodb Table...')
   try:
     awssetup.remove_dynamodb_table(cloudBlueprint['dynamodb:name'])
@@ -23,6 +31,14 @@ def __remove_dynamodb(awssetup, cloudBlueprint):
       AWSSetup._log('=> Table already deleted')
 
 def __remove_iamRole(awssetup, cloudBlueprint):
+  """
+  Remove AWS Dynamodb Resource
+  :param awssetup: Aws Setup Manager
+  :type awssetup: AWSSetup Object
+  :param cloudBlueprint: Amazon resources names and IDs
+  :type cloudBlueprint: json (dictionary)
+  """
+
   print('Removing Iam Role...')
   try:
     awssetup.detach_iam_policy(cloudBlueprint['iam:name'],cloudBlueprint['iam:roles'])
@@ -34,6 +50,14 @@ def __remove_iamRole(awssetup, cloudBlueprint):
       AWSSetup._log('=> IAM Role already deleted')
 
 def __remove_apiGateway(awssetup, cloudBlueprint):
+  """
+  Remove AWS Dynamodb Resource
+  :param awssetup: Aws Setup Manager
+  :type awssetup: AWSSetup Object
+  :param cloudBlueprint: Amazon resources names and IDs
+  :type cloudBlueprint: json (dictionary)
+  """
+
   print('Removing Rest API...')
   try:
     awssetup.delete_apigateway_rest(cloudBlueprint['restApi:id'])
@@ -43,6 +67,14 @@ def __remove_apiGateway(awssetup, cloudBlueprint):
       AWSSetup._log('=> Rest API already Deleted.')
 
 def __remove_lambda_function(awssetup, cloudBlueprint):
+  """
+  Remove AWS Dynamodb Resource
+  :param awssetup: Aws Setup Manager
+  :type awssetup: AWSSetup Object
+  :param cloudBlueprint: Amazon resources names and IDs
+  :type cloudBlueprint: json (dictionary)
+  """
+
   print('Removing Lambda Function...')
   try:
     awssetup.remove_lambda(cloudBlueprint['lambda:name'])
@@ -68,24 +100,25 @@ def purge():
 
   if( not os.path.isfile('uxy.json') ):
     print('Failed to locate app configuration file..')
-  else:
-    appConfig = json.loads(open('uxy.json').read())
-    awssetup = AWSSetup(appConfig)
+    return 
 
-    print('Loading application cloud blueprint...')
-    try:
-      cloudBlueprint = awssetup.load_cloud_config()
-      __remove_iamRole(awssetup, cloudBlueprint)
-      __remove_dynamodb(awssetup, cloudBlueprint)
-      __remove_apiGateway(awssetup, cloudBlueprint)
-      __remove_lambda_function(awssetup, cloudBlueprint)
-    except Exception as e:
-      print(str(e))
-      print('Failed to load cloud blueprint.')
-      print('Try manually removing AWS resources.')
+  appConfig = json.loads(open('uxy.json').read())
+  awssetup = AWSSetup(appConfig)
 
-    print('Removing project files...')
-    os.chdir('../')
-    shutil.rmtree(appConfig['app:name'])
-    print('=> Project removed.')
+  print('Loading application cloud blueprint...')
+  try:
+    cloudBlueprint = awssetup.load_cloud_config()
+    __remove_iamRole(awssetup, cloudBlueprint)
+    __remove_dynamodb(awssetup, cloudBlueprint)
+    __remove_apiGateway(awssetup, cloudBlueprint)
+    __remove_lambda_function(awssetup, cloudBlueprint)
+  except Exception as e:
+    print(str(e))
+    print('Failed to load cloud blueprint.')
+    print('Try manually removing AWS resources.')
+
+  print('Removing project files...')
+  os.chdir('../')
+  shutil.rmtree(appConfig['app:name'])
+  print('=> Project removed.')
 

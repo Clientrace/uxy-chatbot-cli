@@ -45,9 +45,10 @@ def __remove_iamRole(awssetup, cloudBlueprint):
     awssetup.remove_iamrole(cloudBlueprint['iam:name'])
     AWSSetup._log('=> IAM Role deleted')
   except Exception as e:
-    print(str(e))
     if( '(ResourceNotFoundException)' in str(e) ):
       AWSSetup._log('=> IAM Role already deleted')
+    else:
+      AWSSetup._log('=> IAM Role not in cloud blueprint')
 
 def __remove_apiGateway(awssetup, cloudBlueprint):
   """
@@ -120,5 +121,5 @@ def purge():
   print('Removing project files...')
   os.chdir('../')
   shutil.rmtree(appConfig['app:name'])
-  print('=> Project removed.')
+  print('=> Project Files removed.')
 

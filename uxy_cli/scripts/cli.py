@@ -1,13 +1,13 @@
 """
 Authored by Kim Clarence Penaflor
 08/09//2019
-version 0.0.2
+version 0.0.3
 Documented via reST
 
 Project uxy cli command manager module
 """
 
-
+import os
 import json
 import boto3
 import click
@@ -35,6 +35,11 @@ def new(appname, runtime):
   Creates new project.
   """
 
+  if( os.path.exists(appname)):
+    print('Project: '+appname+' already exists..')
+    print('Aborting..')
+    return
+
   botoSession = boto3.session.Session()
   default_region = botoSession.region_name
 
@@ -55,7 +60,7 @@ def purge():
 
 
 @cli.command('deploy')
-@cli.option('-s','--stage')
+@click.option('-s','--stage')
 def deploy(stage):
   """
   Deploy chatbot project

@@ -22,6 +22,7 @@ global _projectBlueprint
 
 _projectBlueprint = {}
 
+
 def _project_setup():
   """
   Initial Project Setup
@@ -47,21 +48,24 @@ def _save_project_blueprint(key, value):
 
   _projectBlueprint[key] = value
 
-def _wait_for_iam(awssetup, roleName):
+def _create_lambda(awssetup, iamRoleARN):
   """
   Wait for iam role until it is generated
   :param awssetup: Amazon Setup Module
   :type awssetp: AwsSetup Object
-  :param roleName: iam role name
-  :type roleName: string
+  :param iamRoleARN: iam role aws resouce name
+  :type iamRoleARN: string
   """
   while True:
     try:
-      print('Getting Iam Role...')
-      awssetup.get_iam_role(roleName)
+      lambdaARN = awssetup.package_lambda(iamRoleARN)
       break
     except Exception as e:
+      print(e)
       pass
+    time.sleep(5)
+  return lambdaARN
+
 
 def _aws_setup():
   """
@@ -79,10 +83,8 @@ def _aws_setup():
   _save_project_blueprint('iam:arn', iamRoleARN)
   _save_project_blueprint('iam:name', _appconfig['app:name']+'-uxy-app')
 
-  # Sleep for 5 seconds, will till iamRole is created
-  time.sleep(5)
+  lambdaARN = _create_lambda(awssetup, iamRoleARN)
 
-  lambdaARN = awssetup.package_lambda(iamRoleARN)
   _save_project_blueprint('lambda:arn', lambdaARN)
   _save_project_blueprint('lambda:name', _appconfig['app:name']+'-uxy-app-'+_appconfig['app:stage'])
 

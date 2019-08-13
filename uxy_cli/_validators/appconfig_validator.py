@@ -25,21 +25,6 @@ class AppConfigValidator:
     """
     self.appConfig = appConfig
 
-  @staticmethod
-  def valid_json(appConfig):
-    """
-    Checks if the param string is a valid json format
-    :param appConfig: application configuration
-    :param type: string
-    :returns: validation result
-    :rtype: boolean
-    """
-    try:
-      json.loads(appConfig)
-    except ValueError:
-      return False
-    return True
-
 
   @staticmethod
   def _compare_keys(config, dictRule):

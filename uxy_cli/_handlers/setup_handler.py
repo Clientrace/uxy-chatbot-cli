@@ -57,10 +57,11 @@ def _wait_for_iam(awssetup, roleName):
   """
   while True:
     try:
+      print('Getting Iam Role...')
       awssetup.get_iam_role(roleName)
       break
     except Exception as e:
-
+      pass
 
 def _aws_setup():
   """

@@ -9,6 +9,8 @@ Project Deployment handler
 import os
 import json
 import configparser
+import hashlib
+from uxy_cli._validators.appconfig_validator import AppConfigValidator
 
 def _file_replacements(stage, config):
   """
@@ -37,21 +39,55 @@ def _file_replacements(stage, config):
 
   return True
 
-def deploy(config, deploymentStage):
+
+def load_config_json():
+  """
+  Load configuration json file (uxy.json)
+  """
+  try:
+    config = json.loads(open('uxy.json').read())
+    return config
+  except Exception as e:
+    print('App Configuration is not valid json format.')
+  return None
+
+def deploy(deploymentStage):
   """
   Deploy chatbot project
+  :param deploymentStage: application deployment stage
+  :type deploymentStage: string
   """
-  deploymentStage = deploymentStage and deploymentStage or config['app:stage']
-
-  # Check deployment stage environment replacements
-  if( deploymentStage not in config['app:config'] ):
-    print('Deployment stage: '+deploymentStage+' not in app configuration (uxy.json) app:config')
-    return
 
   # Look for app configuration file
   if( not os.path.isfile('uxy.json') ):
     print('Failed to locate app configuration file.')
+    print('==> Deployment cancelled.')
     return
+
+  # Validate App Config
+  config = load_config_json()
+  if( not config ):
+    print('==> Deployment cancelled.')
+    return
+
+  appconfigValidator = AppConfigValidator(config)
+  if( appconfigValidator.attrib_check() ):
+    print('App configuration is invalid. Missing some key parameters')
+    print('==> Deployment cancelled.')
+
+  if( appconfigValidator.rule_validation_check() ):
+    print('App configuration is invalid.')
+    print('==> Deployment cancelled.')
+
+  # Check deployment stage environment replacements
+  if( deploymentStage not in config['app:config'] ):
+    print('Deployment stage: '+deploymentStage+' not in app configuration (uxy.json) app:config')
+    print('==> Deployment cancelled.')
+    return
+
+  print('Setting environment variables...')
+  deploymentStage = deploymentStage and deploymentStage or config['app:stage']
+  _file_replacements(deploymentStage, config)
 
   environment = configparser.ConfigParser()
   environment = environment.read('src/env/environment.cfg')
@@ -59,7 +95,6 @@ def deploy(config, deploymentStage):
 
 
 
+
+
   
-
-
-

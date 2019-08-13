@@ -624,6 +624,19 @@ class AWSSetup:
         PolicyArn = policy
       )
 
+  def get_iam_role(self, roleName):
+    """
+    Get iam role by name
+    :param roleName: iam role name
+    :type roleName: string
+    :returns: aws response
+    :rtype: dictionary
+    """
+    resp = self._iamClient.get_role(
+      RoleName = roleName
+    )
+    return resp
+
 
   def delete_s3_bucket(self, bucketName):
     """

@@ -47,12 +47,25 @@ def _save_project_blueprint(key, value):
 
   _projectBlueprint[key] = value
 
+def _wait_for_iam(awssetup, roleName):
+  """
+  Wait for iam role until it is generated
+  :param awssetup: Amazon Setup Module
+  :type awssetp: AwsSetup Object
+  :param roleName: iam role name
+  :type roleName: string
+  """
+  while True:
+    try:
+      awssetup.get_iam_role(roleName)
+      break
+    except Exception as e:
+
 
 def _aws_setup():
   """
   AWS Resource setup
   """
-
   global _appconfig
   global _projectBlueprint
 
@@ -115,11 +128,12 @@ def _setup_(appname, runtime, description, stage, region):
   _project_setup()
   apigateway = _aws_setup()
 
-
-
   print('==> Project successfully created!')
   print('API Invocation URL: '+apigateway['invokeURL'])
   print('Use this url to integrate with a facebook app.')
   print('Deploy project with: uxy deploy --[stage]')
+
+
+
 
 

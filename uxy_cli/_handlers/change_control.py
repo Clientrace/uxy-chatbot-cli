@@ -17,6 +17,11 @@ class ChangeControl:
 
   def __init__(self, path, config):
     """
+    Initialize change control files dir
+    :param path: source files
+    :type path: string
+    :param config: application configuration
+    :type config: string
     """
     self.path = path
     self.config = config
@@ -57,19 +62,22 @@ class ChangeControl:
   def compare_diff(self,path, oldFileChecksums):
     newChecksums = {}
     curChecksums = ChangeControl.generate_filechecksums(self)
-    filesDiff = {}
+    # New to old comparison
     for filedir in curChecksums:
       if( filedir not in oldFileChecksums ):
         ChangeControl._log('+ New File Detected ['+filedir+']')
-        filesDiff[filedir] = 'created'
         newChecksums[filedir] = ChangeControl._get_checksum(filedir)
       else:
         if( curChecksums[filedir] != oldFileChecksums[filedir] ):
           ChangeControl._log('+ File Modified ['+filedir+']')
 
         newChecksums[filedir] = ChangeControl._get_checksum(filedir)
-        curChecksums.pop(filedir)
+        oldFileChecksums.pop(filedir)
 
+    # Old to new comparison
+    for filedir in oldFileChecksums:
+      if( filedir not in curChecksums ):
+        ChangeControl._log('- File removed: ['+filedir+']')
 
 
 

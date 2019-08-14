@@ -30,6 +30,7 @@
   },
   "chatbot:config": {
     "URLsToWhiteList" : [],
+    "enable_menu" : false,
     "persistent_menu" : {
       "locale" : "default",
       "composer_input_disabled" : false,
@@ -55,8 +56,4 @@
  
   "verbosity" : true
 }
-
-
-
-
 

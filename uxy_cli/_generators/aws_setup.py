@@ -288,12 +288,12 @@ class AWSSetup:
     if( not os.path.exists(config['app:name']+'/.tmp') ):
       AWSSetup._log('+ Creating lambda function...')
       os.mkdir(config['app:name']+'/.tmp')
-      funcName = appName+'-uxy-app-'+config['app:stage']
       AWSSetup._compress_app_package(
         config['app:name'],
         config['app:name']+'/.tmp/dist.zip'
       )
 
+    funcName = appName+'-uxy-app-'+config['app:stage']
     zipFile = open(config['app:name']+'/.tmp/dist.zip', 'rb')
     zipFileBin = zipFile.read()
     zipFile.close()
@@ -652,6 +652,7 @@ class AWSSetup:
     self._s3.delete_bucket(
       Bucket = bucketName
     )
+
 
 
 

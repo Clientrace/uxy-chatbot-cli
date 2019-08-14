@@ -12,6 +12,10 @@ import configparser
 import hashlib
 from uxy_cli._validators.appconfig_validator import AppConfigValidator
 
+# TODO: Chatbot setup
+def _chatbot_setup():
+  pass
+
 def _file_replacements(stage, config):
   """
   File Replace In Deployment Environment
@@ -85,15 +89,25 @@ def deploy(deploymentStage):
     print('==> Deployment cancelled.')
     return
 
+  environment = configparser.ConfigParser()
+  # Load environemnt variables
+  try:
+    environment = environment.read('src/env/environment.cfg')
+  except:
+    print('Failed to load environment configuration file')
+    return
+
+  if( environment.get('FACEBOOK','FB_PAGE_TOKEN') == '' ):
+    print('Facebook Page Token hasn\'t been set.')
+    print('Configure the facebook page token in src/env/environment.cfg')
+    return
+
+  # Check for environment variables
   print('Setting environment variables...')
   deploymentStage = deploymentStage and deploymentStage or config['app:stage']
   _file_replacements(deploymentStage, config)
 
-  environment = configparser.ConfigParser()
-  environment = environment.read('src/env/environment.cfg')
-
-
-
+  
 
 
 

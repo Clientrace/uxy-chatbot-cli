@@ -131,6 +131,15 @@
     }
   },
   "chatbot:config" : {
+    "enable_menu" : {
+      "_rule" : {
+        "type" : "boolean",
+        "value" : {
+          "set" : "custom",
+          "type" : "boolean"
+        }
+      }
+    },
     "URLsToWhiteList" : {
       "_rule" : {
         "type" : "list",

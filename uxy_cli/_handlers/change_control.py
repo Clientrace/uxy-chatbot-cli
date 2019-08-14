@@ -6,7 +6,9 @@ Documented via reST
 
 Project uxy cli setup command manager module
 """
+
 import os
+import json
 import hashlib
 
 
@@ -25,7 +27,7 @@ class ChangeControl:
     """
     self.path = path
     self.config = config
-    self.verbosity = config['verbosity']
+    ChangeControl.verbosity = config['verbosity']
 
   @classmethod
   def _log(cls, msg):
@@ -59,25 +61,42 @@ class ChangeControl:
 
     return fileChecksums
 
-  def compare_diff(self,path, oldFileChecksums):
+  def compare_diff(self, path, oldFilesChecksums):
+    """
+    Compare checksums difference
+    :param path: Directory path
+    :type path: string
+    :param oldFilesChecksums: previous files checksums
+    :type oldFilesChecksums: string
+    :return: new checksums and status if changed
+    :rtype: dictionary and boolean
+    """
+
+    changeStatus = False
     newChecksums = {}
     curChecksums = ChangeControl.generate_filechecksums(self)
     # New to old comparison
     for filedir in curChecksums:
-      if( filedir not in oldFileChecksums ):
-        ChangeControl._log('+ New File Detected ['+filedir+']')
+      if( filedir not in oldFilesChecksums ):
+        changeStatus = True
+        ChangeControl._log('+ New File Detected '+filedir+'')
         newChecksums[filedir] = ChangeControl._get_checksum(filedir)
       else:
-        if( curChecksums[filedir] != oldFileChecksums[filedir] ):
-          ChangeControl._log('+ File Modified ['+filedir+']')
+        if( curChecksums[filedir] != oldFilesChecksums[filedir] ):
+          changeStatus = True
+          ChangeControl._log('+ File Modified '+filedir+'')
 
         newChecksums[filedir] = ChangeControl._get_checksum(filedir)
-        oldFileChecksums.pop(filedir)
+        oldFilesChecksums.pop(filedir)
 
     # Old to new comparison
-    for filedir in oldFileChecksums:
+    for filedir in oldFilesChecksums:
       if( filedir not in curChecksums ):
-        ChangeControl._log('- File removed: ['+filedir+']')
+        changeStatus = True
+        ChangeControl._log('- File removed: '+filedir+'')
+
+    return newChecksums, changeStatus
+
 
 
 

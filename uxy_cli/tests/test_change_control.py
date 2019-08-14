@@ -48,14 +48,21 @@ class ChangeControlTest(unittest.TestCase):
 
 
   def test_diff_comparison(self):
+    changeControl = ChangeControl('uxy_cli/tests/testconfig/change_control/test_a/',self.appConfig)
+    checkSums = changeControl.generate_filechecksums()
+
     # Modify Files
     testFileContent = {
-      'sample' : 'sample',
+      'sample' : 'sampl',
       'sample2' : 'sample',
       'sample3' : 'sample',
       'sample4' : 'sample'
     }
-    testFile = open('uxy_cli/tests/testconfig/change_control/test_a/test.json')
+    testFile = open('uxy_cli/tests/testconfig/change_control/test_a/test.json','w')
+    testFile.write(json.dumps(testFileContent, indent=4))
+    testFile.close()
+
+    changeControl.compare_diff('uxy_cli/tests/testconfig/change_control/test_a/test.json', checkSums)
 
     
 

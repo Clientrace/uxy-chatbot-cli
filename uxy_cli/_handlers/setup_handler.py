@@ -13,6 +13,7 @@ import json
 import uxy_cli
 from uxy_cli._generators.aws_setup import AWSSetup
 from uxy_cli._generators.proj_setup import ProjSetup
+from uxy_cli._handlers.change_control import ChangeControl
 
 global ROOT_DIR
 global _appconfig
@@ -91,6 +92,11 @@ def _aws_setup():
   _save_project_blueprint('restApi:id', restApi['restApiId'])
 
   _save_project_blueprint('s3:name', _appconfig['app:name']+'-uxy-app-'+_appconfig['app:stage'])
+
+  print('Saving file checksums...')
+  changeControl = ChangeControl(_appconfig['app:name'], _appconfig)
+  checksums = changeControl.generate_filechecksums()
+  _save_project_blueprint('checksums', checksums)
   awssetup.save_cloud_config(_projectBlueprint)
 
   return restApi

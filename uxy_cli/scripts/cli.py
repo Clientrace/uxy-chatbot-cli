@@ -74,7 +74,9 @@ def generate_component():
 
 
 if __name__ == '__main__':
+  # TODO: Detect if awscli is installed and configured
   cli()
+
 
 
 

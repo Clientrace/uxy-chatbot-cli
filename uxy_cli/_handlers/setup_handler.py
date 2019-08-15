@@ -62,6 +62,7 @@ def _create_lambda(awssetup, iamRoleARN):
       lambdaARN = awssetup.package_lambda(iamRoleARN)
       break
     except Exception as e:
+      print(e)
       pass
     time.sleep(5)
   return lambdaARN

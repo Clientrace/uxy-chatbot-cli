@@ -222,12 +222,16 @@ class AWSSetup:
 
     if( os.path.isfile(appPackageDest) ):
       os.remove(appPackageDest)
-
+    
     zipf = zipfile.ZipFile(appPackageDest, 'w', zipfile.ZIP_DEFLATED)
     AWSSetup._log('+ Compressing Distributable Package...')
     for root, dirs, files in os.walk(appPackageDir):
       for file in files:
         fDir = os.path.join(root, file)
+        # Ignore Git
+        if( '.git' in fDir ):
+          print('Skipping '+fDir)
+          continue
         zipf.write(
           filename = fDir,
           arcname = fDir.replace(appPackageDir,'')
@@ -286,7 +290,6 @@ class AWSSetup:
     """
 
     if( not os.path.exists(config['app:name']+'/.tmp') ):
-      AWSSetup._log('+ Creating lambda function...')
       os.mkdir(config['app:name']+'/.tmp')
       AWSSetup._compress_app_package(
         config['app:name'],
@@ -306,6 +309,7 @@ class AWSSetup:
       if( config['app:runtime'] == 'python' ):
         runtime = 'python3.6'
 
+      AWSSetup._log("+ Creating lambda function...")
       response = _lambda.create_function(
         FunctionName = funcName,
         Runtime = runtime,

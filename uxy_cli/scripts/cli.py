@@ -65,9 +65,7 @@ def deploy(stage):
   """
   Deploy chatbot project
   """
-
-  pass
-
+  deployment_handler.deploy(stage)
 
 
 # TODO: Uxy Chatbot Component generator
@@ -77,7 +75,6 @@ def generate_component():
 
 if __name__ == '__main__':
   cli()
-
 
 
 

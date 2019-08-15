@@ -10,10 +10,16 @@ import os
 import json
 import configparser
 import hashlib
+from uxy_cli._handlers.change_control import ChangeControl
 from uxy_cli._validators.appconfig_validator import AppConfigValidator
+from uxy_cli._generators.aws_setup import AWSSetup
+
 
 # TODO: Chatbot setup
 def _chatbot_setup():
+  pass
+
+def _check_app_changes(config):
   pass
 
 def _file_replacements(stage, config):
@@ -55,6 +61,27 @@ def load_config_json():
     print('App Configuration is not valid json format.')
   return None
 
+
+def _validate_appconfig(config, deploymentStage):
+  appconfigValidator = AppConfigValidator(config)
+  if( appconfigValidator.attrib_check() ):
+    print('App configuration is invalid. Missing some key parameters')
+    print('==> Deployment cancelled.')
+    return False
+
+  if( appconfigValidator.rule_validation_check() ):
+    print('App configuration is invalid.')
+    print('==> Deployment cancelled.')
+    return False
+
+  # Check deployment stage environment replacements
+  if( deploymentStage not in config['app:config'] ):
+    print('Deployment stage: '+deploymentStage+' not in app configuration (uxy.json) app:config')
+    print('==> Deployment cancelled.')
+    return False
+
+  return True
+
 def deploy(deploymentStage):
   """
   Deploy chatbot project
@@ -74,26 +101,17 @@ def deploy(deploymentStage):
     print('==> Deployment cancelled.')
     return
 
-  appconfigValidator = AppConfigValidator(config)
-  if( appconfigValidator.attrib_check() ):
-    print('App configuration is invalid. Missing some key parameters')
-    print('==> Deployment cancelled.')
-
-  if( appconfigValidator.rule_validation_check() ):
-    print('App configuration is invalid.')
-    print('==> Deployment cancelled.')
-
-  # Check deployment stage environment replacements
-  if( deploymentStage not in config['app:config'] ):
-    print('Deployment stage: '+deploymentStage+' not in app configuration (uxy.json) app:config')
-    print('==> Deployment cancelled.')
+  deploymentStage = deploymentStage and deploymentStage or config['app:stage']
+  if( not _validate_appconfig(config, deploymentStage) ):
     return
 
   environment = configparser.ConfigParser()
   # Load environemnt variables
   try:
-    environment = environment.read('src/env/environment.cfg')
-  except:
+    print(os.path.exists('src/env/environment.cfg'))
+    environment.read_file(open('src/env/environment.cfg'))
+  except Exception as e:
+    print(e)
     print('Failed to load environment configuration file')
     return
 
@@ -104,11 +122,14 @@ def deploy(deploymentStage):
 
   # Check for environment variables
   print('Setting environment variables...')
-  deploymentStage = deploymentStage and deploymentStage or config['app:stage']
   _file_replacements(deploymentStage, config)
 
+  awssetup = AWSSetup(config)
+  cloudBlueprint = awssetup.load_cloud_config()
+
+
+  
   
 
 
 
-  

@@ -113,6 +113,7 @@ def purge():
     __remove_dynamodb(awssetup, cloudBlueprint)
     __remove_apiGateway(awssetup, cloudBlueprint)
     __remove_lambda_function(awssetup, cloudBlueprint)
+    __remove_s3_bucket(awssetup, cloudBlueprint)
   except Exception as e:
     print(str(e))
     print('Failed to load cloud blueprint.')
@@ -122,4 +123,7 @@ def purge():
   os.chdir('../')
   shutil.rmtree(appConfig['app:name'])
   print('=> Project Files removed.')
+
+
+
 

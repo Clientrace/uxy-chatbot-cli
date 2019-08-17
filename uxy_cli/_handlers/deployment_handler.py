@@ -64,12 +64,13 @@ def load_config_json():
 
 def _validate_appconfig(config, deploymentStage):
   appconfigValidator = AppConfigValidator(config)
-  if( appconfigValidator.attrib_check() ):
+  if( not appconfigValidator.attrib_check() ):
     print('App configuration is invalid. Missing some key parameters')
     print('==> Deployment cancelled.')
     return False
 
-  if( appconfigValidator.rule_validation_check() ):
+  print('validation check')
+  if( not appconfigValidator.rule_validation_check() ):
     print('App configuration is invalid.')
     print('==> Deployment cancelled.')
     return False

@@ -39,7 +39,7 @@
     ]
   },
   "chatbot:config": {
-    "URLsToWhitelist" : [],
+    "URLsToWhiteList" : [],
     "enable_menu" : false,
     "persistent_menu" : {
       "locale" : "default",

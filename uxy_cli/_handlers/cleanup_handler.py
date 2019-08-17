@@ -87,9 +87,10 @@ def __remove_lambda_function(awssetup, cloudBlueprint):
 def __remove_s3_bucket(awssetup, cloudBlueprint):
   print('Removing s3 bucket...')
   try:
-    awssetup.__remove_s3_bucket(cloudBlueprint['s3:name'])
+    awssetup.delete_s3_bucket(cloudBlueprint['s3:name'])
     AWSSetup._log('=> s3 bucket deleted.')
   except Exception as e:
+    print(str(e))
     if( '(ResourceNotFoundException)' in str(e) ):
       AWSSetup._log('=> s3 bucket already deleted.')
 

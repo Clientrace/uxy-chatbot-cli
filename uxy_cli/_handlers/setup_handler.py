@@ -132,7 +132,9 @@ def _setup_(appname, runtime, description, stage, region):
 
   _save_project_blueprint('app:name', appname)
   _save_project_blueprint('app:region', region)
+  _save_project_blueprint('app:description', _appconfig['app:description'])
   _save_project_blueprint('iam:roles', _appconfig['aws:config']['iam:roles'])
+  _save_project_blueprint('chatbot:config:persistent', _appconfig['chatbot:config']['persistent_menu'])
 
   _project_setup()
   apigateway = _aws_setup()
@@ -141,7 +143,6 @@ def _setup_(appname, runtime, description, stage, region):
   print('API Invocation URL: '+apigateway['invokeURL'])
   print('Use this url to integrate with a facebook app.')
   print('Deploy project with: uxy deploy --[stage]')
-
 
 
 

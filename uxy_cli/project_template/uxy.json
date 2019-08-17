@@ -8,16 +8,16 @@
     "dev" : {
       "fileReplacements" : [
         {
-          "replace" : "_uxy_core/src/env/environment.cfg",
-          "with" : "_uxy_core/src/env/environment.dev.cfg"
+          "replace" : "src/env/environment.cfg",
+          "with" : "src/env/environment.dev.cfg"
         }
       ]
     },
     "prod" : {
       "fileReplacements" : [
         {
-          "replace" : "_uxy_core/src/env/environment.cfg",
-          "with" : "_uxy_core/src/env/environment.prod.cfg"
+          "replace" : "src/env/environment.cfg",
+          "with" : "src/env/environment.prod.cfg"
         }
      ]
     }

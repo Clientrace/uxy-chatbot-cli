@@ -33,12 +33,12 @@ def _file_replacements(stage, config):
   :rtype: boolean
   """
   isFile = lambda path: os.path.isfile(path)
-  for replacements in config['app:config'][stage]:
-    if( isFile(replacements['replace']) ):
+  for replacements in config['app:config'][stage]['fileReplacements']:
+    if( not isFile(replacements['replace']) ):
       print('Failed to locate '+str(replacements['replace']))
       return False
 
-    if( isFile(replacements['with']) ):
+    if( not isFile(replacements['with']) ):
       print('Failed to locate '+str(replacements['with']))
       return False
 
@@ -69,7 +69,6 @@ def _validate_appconfig(config, deploymentStage):
     print('==> Deployment cancelled.')
     return False
 
-  print('validation check')
   if( not appconfigValidator.rule_validation_check() ):
     print('App configuration is invalid.')
     print('==> Deployment cancelled.')
@@ -109,7 +108,6 @@ def deploy(deploymentStage):
   environment = configparser.ConfigParser()
   # Load environemnt variables
   try:
-    print(os.path.exists('src/env/environment.cfg'))
     environment.read_file(open('src/env/environment.cfg'))
   except Exception as e:
     print(e)
@@ -127,10 +125,10 @@ def deploy(deploymentStage):
 
   awssetup = AWSSetup(config)
   cloudBlueprint = awssetup.load_cloud_config()
+  print(cloudBlueprint)
 
 
   
   
-
 
 

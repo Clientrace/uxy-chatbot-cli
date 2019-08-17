@@ -40,7 +40,9 @@ class AWSSetup:
     self.appName = config['app:name']
 
     # Initialize AWS Resources
-    self._s3 = boto3.resource('s3',
+    self._s3Client = boto3.client('s3',
+     region_name=config['aws:config']['region'])
+    self._s3Res = boto3.resource('s3',
      region_name=config['aws:config']['region'])
     self._iamRes = boto3.resource('iam',
      region_name=config['aws:config']['region'])
@@ -589,7 +591,7 @@ class AWSSetup:
     :returns: aws response
     :rtype: dictionary
     """
-    response = AWSSetup._save_s3_resource(self.appName, self._s3, 'text/plain', json.dumps(blueprint, indent=2), self.config)
+    response = AWSSetup._save_s3_resource(self.appName, self._s3Client, 'text/plain', json.dumps(blueprint, indent=2), self.config)
     return response
 
   def load_cloud_config(self):
@@ -597,7 +599,7 @@ class AWSSetup:
     Load cloud configuration file as json
     """
     AWSSetup._log('Loading cloud blueprint...')
-    content = AWSSetup._load_s3_text_resource(self.appName, self._s3, 'aws_blueprint.json', self.config)
+    content = AWSSetup._load_s3_text_resource(self.appName, self._s3Client, 'aws_blueprint.json', self.config)
     return json.loads(content)
 
 
@@ -652,7 +654,7 @@ class AWSSetup:
     :type bucketName: string
     """
 
-    self._s3.delete_bucket(
+    self._s3Res.delete_bucket(
       Bucket = bucketName
     )
 

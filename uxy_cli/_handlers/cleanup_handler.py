@@ -87,7 +87,7 @@ def __remove_lambda_function(awssetup, cloudBlueprint):
 def __remove_s3_bucket(awssetup, cloudBlueprint):
   print('Removing s3 bucket...')
   try:
-    awssetup.delete_s3_bucket(cloudBlueprint['s3:name'])
+    awssetup.delete_s3_objects(cloudBlueprint['s3:name'])
     AWSSetup._log('=> s3 bucket deleted.')
   except Exception as e:
     print(str(e))
@@ -124,7 +124,6 @@ def purge():
   os.chdir('../')
   shutil.rmtree(appConfig['app:name'])
   print('=> Project Files removed.')
-
 
 
 

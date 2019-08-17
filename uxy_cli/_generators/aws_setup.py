@@ -142,6 +142,49 @@ class AWSSetup:
     )
 
   @staticmethod
+  def _list_s3_objects(bucketName, _s3, config):
+    """
+    List all s3 objects
+    :param bucketName: s3 bucket name
+    :type bucketName: string
+    :param _s3: aws s3 instance
+    :type _s3: boto3 object
+    :param config: app configuration
+    :type config: dictionary
+    """
+
+    s3ObjectList = []
+    nextToken = None
+
+    while(True):
+      if( nextToken ):
+        resp = _s3.list_objects_v2(
+          Bucket = bucketName,
+          MaxKeys = 10,
+          ContinuationToken = nextToken
+        )
+      else:
+        resp = _s3.list_objects_v2(
+          Bucket = bucketName,
+          MaxKeys = 10
+        )
+
+      nextToken = None
+      if( resp['IsTruncated'] ):
+        nextToken = resp['NextContinuationToken']
+
+      contents = resp['Contents']
+      for content in contents:
+        s3ObjectList.append({
+          'Key' : content['Key']
+        })
+
+      if( not nextToken ):
+        break
+
+    return s3ObjectList
+
+  @staticmethod
   def _load_s3_text_resource(appName, _s3, resourceName, config):
     """
     :param appName: application name
@@ -591,7 +634,7 @@ class AWSSetup:
     :returns: aws response
     :rtype: dictionary
     """
-    response = AWSSetup._save_s3_resource(self.appName, self._s3Client, 'text/plain', json.dumps(blueprint, indent=2), self.config)
+    response = AWSSetup._save_s3_resource(self.appName, self._s3Res, 'text/plain', json.dumps(blueprint, indent=2), self.config)
     return response
 
   def load_cloud_config(self):
@@ -599,7 +642,7 @@ class AWSSetup:
     Load cloud configuration file as json
     """
     AWSSetup._log('Loading cloud blueprint...')
-    content = AWSSetup._load_s3_text_resource(self.appName, self._s3Client, 'aws_blueprint.json', self.config)
+    content = AWSSetup._load_s3_text_resource(self.appName, self._s3Res, 'aws_blueprint.json', self.config)
     return json.loads(content)
 
 
@@ -647,17 +690,24 @@ class AWSSetup:
     return resp
 
 
-  def delete_s3_bucket(self, bucketName):
+  def delete_s3_objects(self, bucketName):
     """
-    Delete s3 bucket
+    Delete all s3 objects in an s3 bucket
     :param bucketName: name of s3 bucket
     :type bucketName: string
     """
 
-    self._s3Res.delete_bucket(
-      Bucket = bucketName
+    s3ObjectList = AWSSetup._list_s3_objects(bucketName, self._s3Client, self.config)
+    self._s3Client.delete_objects(
+      Bucket = bucketName,
+      Delete = {
+        'Objects' : s3ObjectList
+      }
     )
 
+    self._s3Client.delete_bucket(
+      Bucket = bucketName
+    )
 
 
 

@@ -230,7 +230,6 @@ class AWSSetup:
         fDir = os.path.join(root, file)
         # Ignore Git
         if( '.git' in fDir ):
-          print('Skipping '+fDir)
           continue
         zipf.write(
           filename = fDir,

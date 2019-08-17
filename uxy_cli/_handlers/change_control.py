@@ -57,6 +57,9 @@ class ChangeControl:
     for root, dirs, files in os.walk(self.path):
       for file in files:
         fDir = os.path.join(root, file)
+        # Ignore Git
+        if( '.git' in fDir ):
+          continue
         fileChecksums[fDir] = ChangeControl._get_checksum(fDir)
 
     return fileChecksums

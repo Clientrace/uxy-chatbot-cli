@@ -19,12 +19,13 @@ from uxy_cli._generators.aws_setup import AWSSetup
 def _chatbot_setup():
   pass
 
-def _check_app_changes(config):
-  pass
+def _check_app_changes(config, cloudBlueprint):
+  # Check botconfig app changes
+  config['']
 
 def _file_replacements(stage, config):
   """
-  File Replace In Deployment Environment
+  File Replacement In Deployment Environment
   :param stage: deployment stage
   :type stage: string
   :param config: application configuration

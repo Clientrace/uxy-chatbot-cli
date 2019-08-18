@@ -134,7 +134,7 @@ def _setup_(appname, runtime, description, stage, region):
   _save_project_blueprint('app:region', region)
   _save_project_blueprint('app:description', _appconfig['app:description'])
   _save_project_blueprint('iam:roles', _appconfig['aws:config']['iam:roles'])
-  _save_project_blueprint('chatbot:config:persistent', _appconfig['chatbot:config']['persistent_menu'])
+  _save_project_blueprint('chatbot:menu', _appconfig['chatbot:config']['persistent_menu'])
 
   _project_setup()
   apigateway = _aws_setup()

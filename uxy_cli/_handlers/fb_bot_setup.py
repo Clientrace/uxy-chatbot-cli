@@ -54,6 +54,55 @@ class FBBotSetup:
     else:
       FBBotSetup._log("=> Success.")
 
+  def init_bot_description(self):
+    """
+    Initialize Chatbot Initial Greeting/ Description
+    """
+    FBBotSetup._log("+ Initializing Bot Description...")
+    URL = self.HOST_URL + '/me/messenger_profile?access_token='+self.accessToken
+    payload = {
+      'greeting' : [{
+          'locale' : 'default',
+          'text' : self.config['app:description']
+      }]
+    }
+    resp = requests.post(
+      URL,
+      json = payload
+    )
+    if( resp.status_code != 200 ):
+      FBBotSetup._log('Setup Failed.')
+    else:
+      FBBotSetup._log('=> Success.')
+
+
+  def whitelist_urls(self):
+    """
+    Whitelist chatbot webview urls
+    """
+    FBBotSetup._log("+ Whitelisting URLs...")
+    URL = self.HOST_URL + '/me/messenger_profile?access_token='+self.accessToken
+    payload = {
+      'setting_type' : 'domain_whitelisting',
+      'whitelisted_domains' : self.config['chatbot:config']['URLsToWhiteList'],
+      'domain_action_type' : 'add'
+    }
+    resp = requests.post(
+      URL,
+      json = payload
+    )
+    if( resp.status_code != 200 ):
+      FBBotSetup._log('Setup Failed...')
+    else:
+      FBBotSetup._log('=> Success')
+
+
+
+
+
+
   
+
+
 
 

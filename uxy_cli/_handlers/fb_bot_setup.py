@@ -114,11 +114,26 @@ class FBBotSetup:
       FBBotSetup._log('=> Success')
 
 
+  def init_getstarted(self):
+    """
+    Initialize Get Started Button
+    """
+    FBBotSetup._log("+ Initializing Get Started Button...")
+    URL = self.HOST_URL + '/me/messenger_profile?access_token='+self.accessToken
+    payload = {
+      'get_started' : {
+        'payload' : 'FACEBOOK_WELCOME'
+      }
+    }
+    resp = requests.post(
+      URL,
+      json = payload
+    )
+    if( resp.status_code != 200 ):
+      FBBotSetup._log('Setup Failed...')
+    else:
+      FBBotSetup._log('=> Success')
 
-
-
-
-  
 
 
 

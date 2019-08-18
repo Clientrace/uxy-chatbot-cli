@@ -36,17 +36,19 @@ def _chatbot_setup(config, environment, element, fbBotSetup):
   :param environment: app environment configuration
   :type environment: configparser object
   :param element: chatbot element to setup
-  :type element: string (PERSISTENT_MENU, APP_DESCRIPTION, URL_WHITELIST)
+  :type element: string (GET_STARTED, PERSISTENT_MENU, APP_DESCRIPTION, URL_WHITELIST)
   :param fbBotSetup: facebook chatbot setup
   :type fbBotSetup: FBBotSetup object
   """
-  if( element == 'PERSISTENT_MENU' ):
-    if( config['chatbot:config']['enable_menu'] ):
-      fbBotSetup.init_persistent_menu()
+  if( element == 'GET_STARTED' ):
+    fbBotSetup.init_getstarted()
   if( element == 'APP_DESCRIPTION' ):
     fbBotSetup.init_bot_description()
   if( element == 'URL_WHITELIST' ):
     fbBotSetup.whitelist_urls()
+  if( element == 'PERSISTENT_MENU' ):
+    if( config['chatbot:config']['enable_menu'] ):
+      fbBotSetup.init_persistent_menu()
 
 def _file_replacements(stage, config):
   """
@@ -165,6 +167,7 @@ def deploy(deploymentStage):
   if( update ):
     # Check setup update
     if( cloudBlueprint['deployment:count'] == 0 ):
+      _chatbot_setup(config, environment, 'GET_STARTED', fbBotSetup)
       _chatbot_setup(config, environment, 'PERSISTENT_MENU', fbBotSetup)
       _chatbot_setup(config, environment, 'APP_DESCRIPTION', fbBotSetup)
       _chatbot_setup(config, environment, 'URL_WHITELIST', fbBotSetup)

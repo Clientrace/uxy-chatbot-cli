@@ -54,6 +54,21 @@ class FBBotSetup:
     else:
       FBBotSetup._log("=> Success.")
 
+
+  def check_token_validity(self):
+    """
+    Checks wether the page access token is valid
+    :returns: indicate if token is valid
+    :rtype: boolean
+    """
+    FBBotSetup._log("Checking Page Token validity...")
+    URL = self.HOST_URL+'/me?access_token='+self.accessToken
+    resp = requests.get(URL)
+    if( resp.status_code == 200 ):
+      return True
+    return False
+
+
   def init_bot_description(self):
     """
     Initialize Chatbot Initial Greeting/ Description

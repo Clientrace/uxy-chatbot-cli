@@ -23,7 +23,8 @@ def _check_app_updates(config, cloudBlueprint, environment):
 
   # compare checksums
   changeControl = ChangeControl(os.getcwd(), config)
-  changeControl.compare_diff(cloudBlueprint['checksums'])
+  newChecksums = changeControl.compare_diff(cloudBlueprint['checksums'])
+  print(newChecksums)
 
 
 # TODO: Chatbot setup
@@ -139,7 +140,7 @@ def deploy(deploymentStage):
     print('Failed to load environment configuration file')
     return
 
-  if( environment.get('FACEBOOK','FB_PAGE_TOKEN') == '' ):
+  if( environment.get('FACEBOOK','FB_PAGE_TOKEN') == "''" ):
     print('Facebook Page Token hasn\'t been set.')
     print('Configure the facebook page token in src/env/environment.cfg')
     return

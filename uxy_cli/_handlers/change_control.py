@@ -64,7 +64,7 @@ class ChangeControl:
 
     return fileChecksums
 
-  def compare_diff(self, path, oldFilesChecksums):
+  def compare_diff(self, oldFilesChecksums):
     """
     Compare checksums difference
     :param path: Directory path
@@ -77,7 +77,7 @@ class ChangeControl:
 
     changeStatus = False
     newChecksums = {}
-    curChecksums = ChangeControl.generate_filechecksums(self)
+    curChecksums = ChangeControl.generate_filechecksums(self.path)
     # New to old comparison
     for filedir in curChecksums:
       if( filedir not in oldFilesChecksums ):
@@ -97,6 +97,9 @@ class ChangeControl:
       if( filedir not in curChecksums ):
         changeStatus = True
         ChangeControl._log('- File removed: '+filedir+'')
+
+    if( not changeStatus ):
+      ChangeControl._log(' No updates detected.')
 
     return newChecksums, changeStatus
 

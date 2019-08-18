@@ -11,17 +11,40 @@ import json
 import configparser
 import hashlib
 from uxy_cli._handlers.change_control import ChangeControl
+from uxy_cli._handlers.fb_bot_setup import FBBotSetup
 from uxy_cli._validators.appconfig_validator import AppConfigValidator
 from uxy_cli._generators.aws_setup import AWSSetup
 
 
-# TODO: Chatbot setup
-def _chatbot_setup():
-  pass
+def _check_app_updates(config, cloudBlueprint, environment):
+  """
+  Check application updates for deployment
+  """
 
-def _check_app_changes(config, cloudBlueprint):
-  # Check botconfig app changes
-  config['']
+  # compare checksums
+  changeControl = ChangeControl('.', config)
+  changeControl.compare_diff(cloudBlueprint['checksums'])
+
+
+# TODO: Chatbot setup
+def _chatbot_setup(config, environment, element):
+  """
+  Setup chatbot settings
+  :param config: application configuration
+  :type config: dictionary
+  :param environment: app environment configuration
+  :type environment: configparser object
+  :param element: chatbot element to setup
+  :type element: string (PERSISTENT_MENU, APP_DESCRIPTION, URL_WHITELIST)
+  """
+  fbBotSetup = FBBotSetup(environment.get('FACEBOOK','FB_PAGE_TOKEN'), config)
+  if( element == 'PERSISTENT_MENU' ):
+    if( config['chatbot:config']['enable_menu'] ):
+      fbBotSetup.init_persistent_menu()
+  if( element == 'APP_DESCRIPTION' ):
+    fbBotSetup.init_bot_description()
+  if( element == 'URL_WHITELIST' ):
+    fbBotSetup.whitelist_urls()
 
 def _file_replacements(stage, config):
   """
@@ -41,7 +64,7 @@ def _file_replacements(stage, config):
 
     if( not isFile(replacements['with']) ):
       print('Failed to locate '+str(replacements['with']))
-      return False
+       return False
 
     oldFile = open(replacements['replace'],'w')
     newFile = open(replacements['with']).read()

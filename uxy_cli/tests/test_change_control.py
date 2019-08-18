@@ -62,7 +62,6 @@ class ChangeControlTest(unittest.TestCase):
     testFile.write(json.dumps(testFileContent, indent=4))
     testFile.close()
 
-    changeControl.compare_diff('uxy_cli/tests/testconfig/change_control/test_a/test.json', checkSums)
 
     
 

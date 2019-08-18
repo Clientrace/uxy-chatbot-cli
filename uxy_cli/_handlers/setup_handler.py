@@ -23,7 +23,6 @@ global _projectBlueprint
 
 _projectBlueprint = {}
 
-
 def _project_setup():
   """
   Initial Project Setup

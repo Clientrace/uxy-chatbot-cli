@@ -22,7 +22,7 @@ def _check_app_updates(config, cloudBlueprint, environment):
   """
 
   # compare checksums
-  changeControl = ChangeControl('.', config)
+  changeControl = ChangeControl(os.getcwd(), config)
   changeControl.compare_diff(cloudBlueprint['checksums'])
 
 
@@ -64,8 +64,9 @@ def _file_replacements(stage, config):
 
     if( not isFile(replacements['with']) ):
       print('Failed to locate '+str(replacements['with']))
-       return False
+      return False
 
+    print('Replacing '+replacements['replace']+' with '+replacements['with']+'...')
     oldFile = open(replacements['replace'],'w')
     newFile = open(replacements['with']).read()
     oldFile.write(newFile)
@@ -149,7 +150,9 @@ def deploy(deploymentStage):
 
   awssetup = AWSSetup(config)
   cloudBlueprint = awssetup.load_cloud_config()
-  print(cloudBlueprint)
+
+  print('Checking app updates...')
+  _check_app_updates(config, cloudBlueprint, environment)
 
 
   

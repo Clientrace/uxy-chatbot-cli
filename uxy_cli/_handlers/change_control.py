@@ -60,7 +60,12 @@ class ChangeControl:
         # Ignore Git
         if( '.git' in fDir ):
           continue
-        fileChecksums[fDir] = ChangeControl._get_checksum(fDir)
+        # Ignore tmp
+        if( '.tmp' in fDir ):
+          continue
+
+        fDirInner = fDir.replace(self.path+'/', '')
+        fileChecksums[fDirInner] = ChangeControl._get_checksum(fDir)
 
     return fileChecksums
 
@@ -77,7 +82,7 @@ class ChangeControl:
 
     changeStatus = False
     newChecksums = {}
-    curChecksums = ChangeControl.generate_filechecksums(self.path)
+    curChecksums = ChangeControl.generate_filechecksums(self)
     # New to old comparison
     for filedir in curChecksums:
       if( filedir not in oldFilesChecksums ):
@@ -102,7 +107,6 @@ class ChangeControl:
       ChangeControl._log(' No updates detected.')
 
     return newChecksums, changeStatus
-
 
 
 

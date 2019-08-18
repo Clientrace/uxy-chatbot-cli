@@ -66,6 +66,8 @@ class FBBotSetup:
     resp = requests.get(URL)
     if( resp.status_code == 200 ):
       return True
+
+    FBBotSetup._log('Invalid Page Token.')
     return False
 
 

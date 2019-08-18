@@ -23,12 +23,12 @@ def _check_app_updates(config, cloudBlueprint, environment):
 
   # compare checksums
   changeControl = ChangeControl(os.getcwd(), config)
-  newChecksums = changeControl.compare_diff(cloudBlueprint['checksums'])
-  print(newChecksums)
+  newChecksums, changeStatus = changeControl.compare_diff(cloudBlueprint['checksums'])
+  return newChecksums, changeStatus
 
 
 # TODO: Chatbot setup
-def _chatbot_setup(config, environment, element):
+def _chatbot_setup(config, environment, element, fbBotSetup):
   """
   Setup chatbot settings
   :param config: application configuration
@@ -37,8 +37,9 @@ def _chatbot_setup(config, environment, element):
   :type environment: configparser object
   :param element: chatbot element to setup
   :type element: string (PERSISTENT_MENU, APP_DESCRIPTION, URL_WHITELIST)
+  :param fbBotSetup: facebook chatbot setup
+  :type fbBotSetup: FBBotSetup object
   """
-  fbBotSetup = FBBotSetup(environment.get('FACEBOOK','FB_PAGE_TOKEN'), config)
   if( element == 'PERSISTENT_MENU' ):
     if( config['chatbot:config']['enable_menu'] ):
       fbBotSetup.init_persistent_menu()
@@ -131,8 +132,13 @@ def deploy(deploymentStage):
   if( not _validate_appconfig(config, deploymentStage) ):
     return
 
+  
+  # Check for environment variables
+  print('Setting environment variables...')
+  _file_replacements(deploymentStage, config)
+
   environment = configparser.ConfigParser()
-  # Load environemnt variables
+  # Load environment variables
   try:
     environment.read_file(open('src/env/environment.cfg'))
   except Exception as e:
@@ -140,23 +146,39 @@ def deploy(deploymentStage):
     print('Failed to load environment configuration file')
     return
 
-  if( environment.get('FACEBOOK','FB_PAGE_TOKEN') == "''" ):
+  if( environment.get('FACEBOOK','FB_PAGE_TOKEN') == '' ):
     print('Facebook Page Token hasn\'t been set.')
     print('Configure the facebook page token in src/env/environment.cfg')
     return
 
-  # Check for environment variables
-  print('Setting environment variables...')
-  _file_replacements(deploymentStage, config)
+  # Check FB_PAGE_TOKEN validity
+  fbBotSetup = FBBotSetup(environment.get('FACEBOOK','FB_PAGE_TOKEN'), config)
+  if( not fbBotSetup.check_token_validity() ):
+    print('Please generate another token in app dashboard.')
+    return
 
   awssetup = AWSSetup(config)
   cloudBlueprint = awssetup.load_cloud_config()
 
   print('Checking app updates...')
-  _check_app_updates(config, cloudBlueprint, environment)
+  newChecksums, update = _check_app_updates(config, cloudBlueprint, environment)
+  if( update ):
+    # Check setup update
+    if( cloudBlueprint['deployment:count'] == 0 ):
+      _chatbot_setup(config, environment, 'PERSISTENT_MENU', fbBotSetup)
+      _chatbot_setup(config, environment, 'APP_DESCRIPTION', fbBotSetup)
+      _chatbot_setup(config, environment, 'URL_WHITELIST', fbBotSetup)
+    else:
+      if( newChecksums['uxy.json'] != cloudBlueprint['checksums']['uxy.json'] ):
+        if( config['chatbot:config']['persistent_menu'] != cloudBlueprint['chatbot:menu'] ):
+          _chatbot_setup(config, environment, 'PERSISTENT_MENU', fbBotSetup)
 
+        if( config['chatbot:config']['URLsToWhiteList'] != cloudBlueprint['chatbot:url_whitelist'] ):
+          _chatbot_setup(config, environment, 'URL_WHITELIST', fbBotSetup)
+        
+        if( config['app:description'] != cloudBlueprint['app:description'] ):
+          _chatbot_setup(config, environment, 'APP_DESCRIPTION', fbBotSetup)
 
   
   
-
 

@@ -15,10 +15,15 @@ from uxy_cli._handlers.fb_bot_setup import FBBotSetup
 from uxy_cli._validators.appconfig_validator import AppConfigValidator
 from uxy_cli._generators.aws_setup import AWSSetup
 
-
 def _check_app_updates(config, cloudBlueprint, environment):
   """
   Check application updates for deployment
+  :param config: application configuration
+  :type config: dictionary
+  :param cloudBlueprint: application aws resources blueprint
+  :type cloudBlueprint: json
+  :param environment: app environment configuration
+  :type environment: configparser object
   """
 
   # compare checksums
@@ -183,6 +188,12 @@ def deploy(deploymentStage):
         if( config['app:description'] != cloudBlueprint['app:description'] ):
           _chatbot_setup(config, environment, 'APP_DESCRIPTION', fbBotSetup)
 
-  
+  print('Updating applcation blueprint...')
+  cloudBlueprint['checksums'] = newChecksums
+  cloudBlueprint['deployment:count'] = cloudBlueprint['deployment:count'] + 1
+  awssetup.save_cloud_config(cloudBlueprint)
+
   
 
+  
+  

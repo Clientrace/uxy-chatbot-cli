@@ -45,7 +45,8 @@ def _chatbot_setup(config, environment, element, fbBotSetup):
   if( element == 'APP_DESCRIPTION' ):
     fbBotSetup.init_bot_description()
   if( element == 'URL_WHITELIST' ):
-    fbBotSetup.whitelist_urls()
+    if( config['chatbot:config']['URLsToWhiteList'] != [] ):
+      fbBotSetup.whitelist_urls()
   if( element == 'PERSISTENT_MENU' ):
     if( config['chatbot:config']['enable_menu'] ):
       fbBotSetup.init_persistent_menu()

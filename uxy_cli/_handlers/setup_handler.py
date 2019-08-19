@@ -72,11 +72,10 @@ def _create_s3_bucket(awssetup):
   :param awssetup: Amazon Setup Module
   :type awssetp: AwsSetup Object
   """
-  while True:
-    status = awssetup.setup_s3_bucket()
-    if status :
-      break
-    print('Retrying s3 Creation')
+  status = awssetup.setup_s3_bucket()
+  if not status :
+    print('Please use other application name..')
+  return status
 
 def _aws_setup():
   """
@@ -88,7 +87,12 @@ def _aws_setup():
   print('Creating AWS Resources...')
   awssetup = AWSSetup(_appconfig)
   awssetup.setup_dynamodb_table()
-  _create_s3_bucket(awssetup)
+
+
+  s3Status = _create_s3_bucket(awssetup)
+  if( not s3Status ):
+    return None
+
   _save_project_blueprint('dynamodb:name', _appconfig['app:name']+'-uxy-session-'+_appconfig['app:stage'])
 
   iamRoleARN = awssetup.setup_iamrole()
@@ -151,6 +155,9 @@ def _setup_(appname, runtime, description, stage, region):
 
   _project_setup()
   apigateway = _aws_setup()
+  if( not apigateway ):
+    print('Project setup aborted.')
+    return
 
   print('==> Project successfully created!')
   print('API Invocation URL: '+apigateway['invokeURL'])

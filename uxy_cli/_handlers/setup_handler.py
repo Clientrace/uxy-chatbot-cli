@@ -61,10 +61,22 @@ def _create_lambda(awssetup, iamRoleARN):
       lambdaARN = awssetup.package_lambda(iamRoleARN)
       break
     except Exception as e:
+      print('IAM Resource not yet available, Retrying Lambda Creation...')
       pass
     time.sleep(5)
   return lambdaARN
 
+def _create_s3_bucket(awssetup):
+  """
+  Wait for s3 bucket setup
+  :param awssetup: Amazon Setup Module
+  :type awssetp: AwsSetup Object
+  """
+  while True:
+    status = awssetup.setup_s3_bucket()
+    if status :
+      break
+    print('Retrying s3 Creation')
 
 def _aws_setup():
   """
@@ -76,6 +88,7 @@ def _aws_setup():
   print('Creating AWS Resources...')
   awssetup = AWSSetup(_appconfig)
   awssetup.setup_dynamodb_table()
+  _create_s3_bucket(awssetup)
   _save_project_blueprint('dynamodb:name', _appconfig['app:name']+'-uxy-session-'+_appconfig['app:stage'])
 
   iamRoleARN = awssetup.setup_iamrole()

@@ -1,7 +1,7 @@
 """
 Authored by Kim Clarence Penaflor
 08/05/2019
-version 0.0.2
+version 0.0.3
 Documented via reST
 
 AWS Development Environment Setup
@@ -106,6 +106,37 @@ class AWSSetup:
         AWSSetup._log('=> Table already exist')
 
   @staticmethod
+  def _create_s3_bucket(appName, _s3, config):
+    """
+    Creates s3 bucket
+    :param appName: application name
+    :type appName: string
+    :param _s3: aws s3 instance
+    :type _s3: boto3 object
+    :param config: app configuration
+    :type config: dictionary
+    :returns: creation status
+    :rtype: boolean
+    """
+    status = False
+    s3BucketName = appName+'-uxy-app-'+config['app:stage']
+    AWSSetup._log('+ Creating s3 bucket...')
+    try:
+      _s3.create_bucket(
+        Bucket = s3BucketName,
+        CreateBucketConfiguration = {
+          'LocationConstraint' : config['aws:config']['region']
+        }
+      )
+      status = True
+    except Exception as e:
+      if( '(OperationAborted)' in str(e) ):
+        AWSSetup._log('Bucket name in on queue for deletion.')
+
+    return status
+
+
+  @staticmethod
   def _save_s3_resource(appName, _s3, contentType, data, config):
     """
     Creates bucket and saves s3 resource data
@@ -119,19 +150,6 @@ class AWSSetup:
     :type config: dictionary
     """
     s3BucketName = appName+'-uxy-app-'+config['app:stage']
-    AWSSetup._log('+ Creating s3 bucket... ')
-    try:
-      _s3.create_bucket(
-        Bucket = s3BucketName,
-        CreateBucketConfiguration = {
-          'LocationConstraint' : config['aws:config']['region']
-        }
-      )
-    except Exception as e:
-      if( '(EntityAlreadyExists)' in str(e) ):
-        AWSSetup._log('=> Bucket already exist')
-
-
     filename = 'aws_blueprint.json'
     s3Object = _s3.Object(s3BucketName, filename)
 
@@ -624,6 +642,14 @@ class AWSSetup:
     """
 
     response = AWSSetup._generate_uxy_api(self.appName, self._apiGateway, lambdaARN, self.config)
+    return response
+
+  def setup_s3_bucket(self):
+    """
+    Setup s3 bucket
+    """
+
+    response = AWSSetup._create_s3_bucket(self.appName, self._s3Res, self.config)
     return response
 
   def save_cloud_config(self, blueprint):

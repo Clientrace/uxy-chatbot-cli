@@ -28,7 +28,8 @@ def _check_app_updates(config, cloudBlueprint, environment):
 
   # compare checksums
   changeControl = ChangeControl(os.getcwd(), config)
-  newChecksums, changeStatus = changeControl.compare_diff(cloudBlueprint['checksums'])
+  newChecksums, changeStatus = \
+    changeControl.compare_diff(cloudBlueprint['checksums'])
   return newChecksums, changeStatus
 
 
@@ -41,7 +42,7 @@ def _chatbot_setup(config, environment, element, fbBotSetup):
   :param environment: app environment configuration
   :type environment: configparser object
   :param element: chatbot element to setup
-  :type element: string (GET_STARTED, PERSISTENT_MENU, APP_DESCRIPTION, URL_WHITELIST)
+  :type element: string 
   :param fbBotSetup: facebook chatbot setup
   :type fbBotSetup: FBBotSetup object
   """
@@ -66,6 +67,7 @@ def _file_replacements(stage, config):
   :returns: replacement successful
   :rtype: boolean
   """
+  print('Setting environment variables...')
   isFile = lambda path: os.path.isfile(path)
   for replacements in config['app:config'][stage]['fileReplacements']:
     if( not isFile(replacements['replace']) ):
@@ -76,26 +78,14 @@ def _file_replacements(stage, config):
       print('Failed to locate '+str(replacements['with']))
       return False
 
-    print('Replacing '+replacements['replace']+' with '+replacements['with']+'...')
+    print('Replacing '+replacements['replace']+' with '+replacements['with']\
+      +'...')
     oldFile = open(replacements['replace'],'w')
     newFile = open(replacements['with']).read()
     oldFile.write(newFile)
     oldFile.close()
 
   return True
-
-
-def load_config_json():
-  """
-  Load configuration json file (uxy.json)
-  """
-  try:
-    config = json.loads(open('uxy.json').read())
-    return config
-  except Exception as e:
-    print('App Configuration is not valid json format.')
-  return None
-
 
 def _validate_appconfig(config, deploymentStage):
   appconfigValidator = AppConfigValidator(config)
@@ -111,59 +101,59 @@ def _validate_appconfig(config, deploymentStage):
 
   # Check deployment stage environment replacements
   if( deploymentStage not in config['app:config'] ):
-    print('Deployment stage: '+deploymentStage+' not in app configuration (uxy.json) app:config')
+    print('Deployment stage: '+deploymentStage\
+      +' not in app configuration (uxy.json) app:config')
     print('==> Deployment cancelled.')
     return False
 
   return True
 
-def deploy(deploymentStage):
+
+def load_config_json(deploymentStage):
   """
-  Deploy chatbot project
+  Load configuration json file (uxy.json)
   :param deploymentStage: application deployment stage
   :type deploymentStage: string
   """
-
-  # Look for app configuration file
-  if( not os.path.isfile('uxy.json') ):
-    print('Failed to locate app configuration file.')
-    print('==> Deployment cancelled.')
-    return
-
-  # Validate App Config
-  config = load_config_json()
-  if( not config ):
-    print('==> Deployment cancelled.')
-    return
+  try:
+    config = json.loads(open('uxy.json').read())
+  except Exception as e:
+    print('App Configuration is not valid json format.')
+    raise Exception(e)
 
   deploymentStage = deploymentStage and deploymentStage or config['app:stage']
-  if( not _validate_appconfig(config, deploymentStage) ):
-    return
+  if( not _validate_appconfig(config, deploymentStage)):
+    raise Exception(e)
 
-  
-  # Check for environment variables
-  print('Setting environment variables...')
-  _file_replacements(deploymentStage, config)
+  return config, deploymentStage
 
+
+def load_env_vars():
+  """
+  Load environment variables
+  """
   environment = configparser.ConfigParser()
-  # Load environment variables
   try:
     environment.read_file(open('src/env/environment.cfg'))
   except Exception as e:
-    print(e)
     print('Failed to load environment configuration file')
-    return
+    raise Exception(str(e))
 
   if( environment.get('FACEBOOK','FB_PAGE_TOKEN') == '' ):
     print('Facebook Page Token hasn\'t been set.')
     print('Configure the facebook page token in src/env/environment.cfg')
-    return
+    raise Exception('Empty facebook page token')
 
-  # Check FB_PAGE_TOKEN validity
-  fbBotSetup = FBBotSetup(environment.get('FACEBOOK','FB_PAGE_TOKEN'), config)
+  return environment
+
+
+def setup_fb_bot(environment, config):
+  """
+  Setup facebook chatbot
+  """
+  fbBotSetup = FBBotSetup(environment.get('FACEBOOK', 'FB_PAGE_TOKEN'), config)
   if( not fbBotSetup.check_token_validity() ):
-    print('Please generate another token in app dashboard.')
-    return
+    raise Exception('s3 bucket name not available.')
 
   awssetup = AWSSetup(config)
   cloudBlueprint = awssetup.load_cloud_config()
@@ -179,14 +169,43 @@ def deploy(deploymentStage):
       _chatbot_setup(config, environment, 'URL_WHITELIST', fbBotSetup)
     else:
       if( newChecksums['uxy.json'] != cloudBlueprint['checksums']['uxy.json'] ):
-        if( config['chatbot:config']['persistent_menu'] != cloudBlueprint['chatbot:menu'] ):
+        if( config['chatbot:config']['persistent_menu']\
+           != cloudBlueprint['chatbot:menu'] ):
           _chatbot_setup(config, environment, 'PERSISTENT_MENU', fbBotSetup)
 
-        if( config['chatbot:config']['URLsToWhiteList'] != cloudBlueprint['chatbot:url_whitelist'] ):
+        if( config['chatbot:config']['URLsToWhiteList']\
+           != cloudBlueprint['chatbot:url_whitelist'] ):
           _chatbot_setup(config, environment, 'URL_WHITELIST', fbBotSetup)
         
         if( config['app:description'] != cloudBlueprint['app:description'] ):
           _chatbot_setup(config, environment, 'APP_DESCRIPTION', fbBotSetup)
+
+  return awssetup, cloudBlueprint, newChecksums
+
+
+def deploy(deploymentStage):
+  """
+  Deploy chatbot project
+  :param deploymentStage: application deployment stage
+  :type deploymentStage: string
+  """
+
+  # Look for app configuration file
+  if( not os.path.isfile('uxy.json') ):
+    print('Failed to locate app configuration file.')
+    print('==> Deployment cancelled.')
+    return
+
+  # Validate App Config
+  try:
+    config, deploymentStage = load_config_json(deploymentStage)
+    _file_replacements(deploymentStage, config)
+    environment = load_env_vars()
+    awssetup, cloudBlueprint, newChecksums = setup_fb_bot(environment, config)
+  except:
+    print('==> Deployment cancelled')
+    return
+
 
   print('Updating applcation blueprint...')
   cloudBlueprint['checksums'] = newChecksums
@@ -197,3 +216,4 @@ def deploy(deploymentStage):
 
   
   
+

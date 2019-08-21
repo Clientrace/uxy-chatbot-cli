@@ -15,6 +15,7 @@ import uxy_cli
 from uxy_cli._handlers import setup_handler
 from uxy_cli._handlers import cleanup_handler
 from uxy_cli._handlers import deployment_handler
+from uxy_cli._handlers import applogs_handler
 
 @click.group()
 def cli():
@@ -66,6 +67,14 @@ def deploy(stage):
   Deploy chatbot project
   """
   deployment_handler.deploy(stage)
+
+@cli.command('logs')
+def logs():
+  """
+  Get application logs
+  """
+  applogs_handler.getlogs()
+
 
 
 # TODO: Uxy Chatbot Component generator

@@ -56,6 +56,8 @@ class AWSSetup:
      region_name=config['aws:config']['region'])
     self._apiGateway = boto3.client('apigateway',
      region_name=config['aws:config']['region'])
+    self._logs = boto3.client('logs',
+     region_name=config['aws:config']['region'])
 
 
   @classmethod
@@ -621,6 +623,66 @@ class AWSSetup:
       'restApiId' : restApiId,
       'invokeURL' : invokeURL
     }
+
+  @staticmethod
+  def _get_stream_name(groupname, _logs):
+    """
+    Get AWS Stream name
+    :param groupname: cloudwatch log group name
+    :type groupname: string
+    :param _logs: cloudwatch instance
+    :type _logs: boto3 object
+    :returns: log stream name
+    :rtype: string
+    """
+    try:
+      resp = _logs.describe_log_streams(
+        logGroupName = groupname,
+        orderBy = 'LastEventTime',
+        descending = True,
+        limit = 1
+      )
+    except Exception as e:
+      if( '(ResourceNotFoundException)' in str(e) ):
+        print('No application logs yet.')
+        return
+
+    return resp['logStreams'][0]['logStreamName']
+
+
+  @staticmethod
+  def _get_log_stream(groupname, _logs):
+    """
+    Get Log streams
+    :param groupname: cloudwatch log group name
+    :type groupname: string
+    :param _logs: cloudwatch instance
+    :type _logs: boto3 object
+    :returns: log stream events
+    :rtype: dictionary
+    """
+    stream_name = AWSSetup._get_stream_name(groupname, _logs)
+    if( stream_name ):
+      resp = _logs.get_log_events(
+        logGroupName = groupname,
+        logStreamName = stream_name
+      )
+    else:
+      return
+
+    return resp['events']
+
+  def get_logs(self):
+    """
+    Get cloudwatch events
+    """
+    groupname = '/aws/lambda/'+self.config['app:name']
+    streams = AWSSetup._get_log_stream(groupname, self._logs)
+    streamLogs = ''
+    if( streams ):
+      for stream in streams:
+        streamLogs += stream['message'] + '\n'
+    return streamLogs
 
   def remove_iamrole(self, roleName):
     """

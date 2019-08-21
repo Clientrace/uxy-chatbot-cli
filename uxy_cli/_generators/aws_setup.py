@@ -414,10 +414,14 @@ class AWSSetup:
     """
     if( not os.path.exists('.tmp') ):
       os.mkdir('.tmp')
-      AWSSetup._compress_app_package(
-        os.getcwd(),
-        os.getcwd()+'/.tmp/dist.zip'
-      )
+
+    if( os.path.isfile('.tmp/dist.zip') ):
+      os.remove('.tmp/dist.zip')
+
+    AWSSetup._compress_app_package(
+      os.getcwd(),
+      os.getcwd()+'/.tmp/dist.zip'
+    )
     
     funcName = appname+'-uxy-app-'+config['app:stage']
     zipFile = open('.tmp/dist.zip', 'rb')

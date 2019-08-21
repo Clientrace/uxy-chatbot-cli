@@ -8,6 +8,7 @@ Project Deployment handler
 
 import os
 import json
+import copy
 import configparser
 import hashlib
 from uxy_cli._handlers.change_control import ChangeControl
@@ -27,9 +28,13 @@ def _check_app_updates(config, cloudBlueprint, environment):
   """
 
   # compare checksums
+
   changeControl = ChangeControl(os.getcwd(), config)
+  cloudBlueprintCopy = copy.deepcopy(cloudBlueprint)
+  cloudCheckSums = cloudBlueprintCopy['checksums']
   newChecksums, changeStatus = \
-    changeControl.compare_diff(cloudBlueprint['checksums'])
+    changeControl.compare_diff(cloudCheckSums)
+
   return newChecksums, changeStatus
 
 
@@ -203,12 +208,13 @@ def deploy(deploymentStage):
     environment = load_env_vars()
     awssetup, cloudBlueprint, newChecksums = setup_fb_bot(environment, config)
     awssetup.update_lambda()
-  except:
+  except Exception as e:
+    print(str(e))
     print('==> Deployment cancelled')
     return
 
 
-  print('Updating applcation blueprint...')
+  print('Updating appilcation blueprint...')
   cloudBlueprint['checksums'] = newChecksums
   cloudBlueprint['deployment:count'] = cloudBlueprint['deployment:count'] + 1
   awssetup.save_cloud_config(cloudBlueprint)
@@ -217,4 +223,3 @@ def deploy(deploymentStage):
 
   
   
-

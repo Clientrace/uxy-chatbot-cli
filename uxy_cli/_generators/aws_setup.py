@@ -403,6 +403,12 @@ class AWSSetup:
   def _update_lambda(appname, _lambda, config):
     """
     Update lambda function
+    :param appname: application name
+    :type appname: string
+    :param _lambda: aws lambda instance
+    :type _lambda: boto3 object
+    :param config: app configuration
+    :type config: dictionary
     """
     if( not os.path.exists('.tmp') ):
       os.mkdir('.tmp')
@@ -658,6 +664,17 @@ class AWSSetup:
 
     response = AWSSetup._generate_lambda(self.appName, self._lambda, roleARN, self.config)
     return response['FunctionArn']
+
+  def update_lambda(self):
+    """
+    Update lambda function code
+    """
+
+    try:
+      AWSSetup._update_lambda(self.appName, self._lambda, self.config)
+    except Exception as e:
+      AWSSetup._log(str(e))
+      AWSSetup._log("Failed to update application code.")
 
   def setup_uxy_api(self, lambdaARN):
     """

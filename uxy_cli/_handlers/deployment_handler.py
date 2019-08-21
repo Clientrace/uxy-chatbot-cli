@@ -202,6 +202,7 @@ def deploy(deploymentStage):
     _file_replacements(deploymentStage, config)
     environment = load_env_vars()
     awssetup, cloudBlueprint, newChecksums = setup_fb_bot(environment, config)
+    awssetup.update_lambda()
   except:
     print('==> Deployment cancelled')
     return

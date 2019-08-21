@@ -489,7 +489,8 @@ class AWSSetup:
     return response
 
   @staticmethod
-  def _add_uxy_webhook_method(restApiId, resourceId, httpMethod, lambdaARN, _apiGateway, config):
+  def _add_uxy_webhook_method(restApiId, resourceId, httpMethod, lambdaARN,\
+     _apiGateway, config, requestTemplates=None):
     """
     Add uxy App API Resource for FB Webhook
     :param restApiId: aws api gateway rest api id
@@ -515,16 +516,28 @@ class AWSSetup:
       authorizationType = 'NONE'
     )
 
-    lambdaMethodURI = 'arn:aws:apigateway:'+config['aws:config']['region']+':lambda:path'\
+    lambdaMethodURI = 'arn:aws:apigateway:'+config['aws:config']['region']\
+      +':lambda:path'\
       + '/2015-03-31/functions/'+lambdaARN+'/invocations'
-    response = _apiGateway.put_integration(
-      restApiId = restApiId,
-      resourceId = resourceId,
-      httpMethod = httpMethod,
-      type = 'AWS',
-      integrationHttpMethod = 'POST',
-      uri = lambdaMethodURI
-    )
+    if( requestTemplates ):
+      response = _apiGateway.put_integration(
+        restApiId = restApiId,
+        resourceId = resourceId,
+        httpMethod = httpMethod,
+        type = 'AWS',
+        integrationHttpMethod = 'POST',
+        uri = lambdaMethodURI,
+        requestTemplates = requestTemplates
+      )
+    else:
+      response = _apiGateway.put_integration(
+        restApiId = restApiId,
+        resourceId = resourceId,
+        httpMethod = httpMethod,
+        type = 'AWS',
+        integrationHttpMethod = 'POST',
+        uri = lambdaMethodURI
+      )
     return response
 
   @staticmethod
@@ -544,17 +557,30 @@ class AWSSetup:
     """
 
     AWSSetup._log('+ Generating Rest API...')
-    response = AWSSetup._generate_apigateway_rest_api(appName, _apiGateway, config)
+    response = AWSSetup._generate_apigateway_rest_api(appName, _apiGateway,\
+      config)
     restApiId = response['id']
 
-    response = AWSSetup._generate_apigateway_resource(restApiId, 'uxy-webhook', _apiGateway)
+    response = AWSSetup._generate_apigateway_resource(restApiId, 'uxy-webhook',\
+      _apiGateway)
     webhookResourceId = response['id']
 
-    AWSSetup._add_uxy_webhook_method(restApiId, webhookResourceId, 'POST', lambdaARN, _apiGateway, config)
+    fbCallBackMapping = {
+      "application/json" : "{\"hub.mode\":\"$input.params('hub.mode')\",\
+      \"hub.challenge\":\"$input.params('hub.challenge')\",\
+      \"hub.verify_token\":\"$input.params('hub.verify_token')\"}"
+    }
+
+    AWSSetup._add_uxy_webhook_method(restApiId, webhookResourceId, 'POST',\
+      lambdaARN, _apiGateway, config)
+    AWSSetup._add_uxy_webhook_method(restApiId, webhookResourceId, 'GET',\
+      lambdaARN, _apiGateway, config, fbCallBackMapping)
 
     AWSSetup._log('+ Deploying API...')
     response = AWSSetup._deploy_api(restApiId, _apiGateway, config)
-    invokeURL = 'https://'+restApiId+'execute-api.'+config['aws:config']['region']+'.amazonaws.com/v'+config['app:version']+'/uxy-webhook'
+    invokeURL = 'https://'+restApiId+'execute-api.'\
+      +config['aws:config']['region']+'.amazonaws.com/v'\
+      +config['app:version']+'/uxy-webhook'
 
     AWSSetup._log('=> API Deployed')
 

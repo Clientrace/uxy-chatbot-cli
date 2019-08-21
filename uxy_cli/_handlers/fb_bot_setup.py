@@ -1,5 +1,5 @@
 """
-Authorred By Kim Clarence Penaflor
+Authored By Kim Clarence Penaflor
 08/18/2019
 version 0.0.1
 

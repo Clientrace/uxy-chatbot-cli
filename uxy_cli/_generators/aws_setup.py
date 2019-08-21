@@ -292,7 +292,9 @@ class AWSSetup:
       for file in files:
         fDir = os.path.join(root, file)
         # Ignore Git
-        if( '.git' in fDir ):
+        if( '.git/' in fDir ):
+          continue
+        if( '.tmp/' in fDir ):
           continue
         zipf.write(
           filename = fDir,
@@ -396,6 +398,37 @@ class AWSSetup:
 
 
     return response
+
+  @staticmethod
+  def _update_lambda(appname, _lambda, config):
+    """
+    Update lambda function
+    :param appname: application name
+    :type appname: string
+    :param _lambda: aws lambda instance
+    :type _lambda: boto3 object
+    :param config: app configuration
+    :type config: dictionary
+    """
+    if( not os.path.exists('.tmp') ):
+      os.mkdir('.tmp')
+      AWSSetup._compress_app_package(
+        os.getcwd(),
+        os.getcwd()+'/.tmp/dist.zip'
+      )
+    
+    funcName = appname+'-uxy-app-'+config['app:stage']
+    zipFile = open('.tmp/dist.zip', 'rb')
+    zipFileBin = zipFile.read()
+    zipFile.close()
+
+    AWSSetup._log('+ Updating lambda function...')
+    response = _lambda.update_function_code(
+      FunctionName = funcName,
+      ZipFile = zipFileBin
+    )
+    AWSSetup._log('=> Lambda package deployed')
+
 
 
   @staticmethod
@@ -657,6 +690,17 @@ class AWSSetup:
 
     response = AWSSetup._generate_lambda(self.appName, self._lambda, roleARN, self.config)
     return response['FunctionArn']
+
+  def update_lambda(self):
+    """
+    Update lambda function code
+    """
+
+    try:
+      AWSSetup._update_lambda(self.appName, self._lambda, self.config)
+    except Exception as e:
+      AWSSetup._log(str(e))
+      AWSSetup._log("Failed to update application code.")
 
   def setup_uxy_api(self, lambdaARN):
     """

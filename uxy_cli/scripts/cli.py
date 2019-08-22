@@ -1,7 +1,7 @@
 """
 Authored by Kim Clarence Penaflor
 08/09//2019
-version 0.0.3
+version 0.0.4
 Documented via reST
 
 Project uxy cli command manager module
@@ -16,6 +16,7 @@ from uxy_cli._handlers import setup_handler
 from uxy_cli._handlers import cleanup_handler
 from uxy_cli._handlers import deployment_handler
 from uxy_cli._handlers import applogs_handler
+from uxy_cli._handlers import info_handler
 
 @click.group()
 def cli():
@@ -58,6 +59,16 @@ def purge():
 
   if(click.confirm('Are you sure you want to remove the project and its resources?')):
     cleanup_handler.purge()
+
+
+@cli.command('info')
+@click.option('-s','--stage')
+def info(stage):
+  """
+  Get's chatbot info
+  """
+
+  info_handler.get_cloud_blueprint(stage)
 
 
 @cli.command('deploy')

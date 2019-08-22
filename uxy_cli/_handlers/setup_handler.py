@@ -106,6 +106,7 @@ def _aws_setup():
 
   restApi = awssetup.setup_uxy_api(lambdaARN)
   _save_project_blueprint('restApi:id', restApi['restApiId'])
+  _save_project_blueprint('restApi:invokeURL', restApi['invokeURL'])
 
   _save_project_blueprint('s3:name', _appconfig['app:name']+'-uxy-app-'+_appconfig['app:stage'])
 

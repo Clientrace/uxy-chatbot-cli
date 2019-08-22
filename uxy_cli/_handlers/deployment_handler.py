@@ -93,6 +93,15 @@ def _file_replacements(stage, config):
   return True
 
 def _validate_appconfig(config, deploymentStage):
+  """
+  Validate app configuration file
+  :param config: application configuration
+  :type config: dictionary
+  :param deploymentStage: application deployment stage
+  :type deploymentStage: string
+  :returns: app config validility
+  :rtype: boolean
+  """
   appconfigValidator = AppConfigValidator(config)
   if( not appconfigValidator.attrib_check() ):
     print('App configuration is invalid. Missing some key parameters')

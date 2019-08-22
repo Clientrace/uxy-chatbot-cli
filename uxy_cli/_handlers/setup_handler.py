@@ -7,6 +7,7 @@ Documented via reST
 Project uxy cli setup command manager module
 """
 
+import uuid
 import time
 import os
 import json
@@ -29,6 +30,9 @@ def _project_setup():
   """
 
   global _appconfig
+
+  fbVerifyToken = uuid.uuid4().hex
+  _appconfig['fb:verifyToken'] = fbVerifyToken
 
   print('Loading project...')
   projsetup = ProjSetup(_appconfig)

@@ -36,8 +36,9 @@ def _project_setup():
 
   print('Loading project...')
   projsetup = ProjSetup(_appconfig)
-  projsetup._clone()
-  projsetup._add_app_config()
+  projsetup.clone()
+  projsetup.add_app_config()
+  projsetup.install_dependencies()
 
 
 def _save_project_blueprint(key, value):

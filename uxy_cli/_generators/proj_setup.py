@@ -30,7 +30,33 @@ class ProjSetup:
       print('[SETUP] : '+msg)
 
 
-  def _add_app_config(self):
+  def create_dist(self):
+    """
+    Create APP Distributable
+    """
+
+    distPath = self.config['app:name']+'/.tmp/dist'
+    if( not os.path.exists(distPath) ):
+      os.mkdir(distPath)
+
+    for root, dirs, files in os.walk(self.config['app:name']):
+      for file in files:
+        fDir = os.path.join(root, file)
+        if( '.git/' in fDir ):
+          continue
+        if( '.tmp/' in fDir ):
+          continue
+
+  def install_dependencies(self):
+    """
+    Install project dependencies
+    """
+    distPath = self.config['app:name']+'/.tmp/dist'
+    if( not os.path.exists(distPath) ):
+      os.mkdir(distPath)
+      os.system('pip3 install --system --prefix= requests -t '+distPath)
+
+  def add_app_config(self):
     """
     Copy app config into newly created project
     """
@@ -39,7 +65,7 @@ class ProjSetup:
     configFile.close()
 
 
-  def _clone(self):
+  def clone(self):
     """
     Clone Project Repositry
     """
@@ -48,7 +74,4 @@ class ProjSetup:
     repo = git.Repo.clone_from(self.chatbot_core_repo[self.config['app:runtime']], self.config['app:name'])
     repo.remotes.origin.config_writer.set('pushurl','')
     repo.remotes.origin.config_writer.set('url','')
-
-
-
 

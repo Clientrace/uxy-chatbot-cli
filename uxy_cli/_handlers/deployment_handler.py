@@ -196,7 +196,6 @@ def setup_fb_bot(environment, config):
 
   return awssetup, cloudBlueprint, newChecksums
 
-
 def deploy(deploymentStage):
   """
   Deploy chatbot project

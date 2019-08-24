@@ -109,7 +109,14 @@ def purge():
 
   print('Loading application cloud blueprint...')
   try:
-    cloudBlueprint = awssetup.load_cloud_config()
+    try:
+      cloudBlueprint = awssetup.load_cloud_config()
+    except Exception as e:
+      if( '(AccessDenied)' in str(e) ):
+        print('Access Denied, make sure you have the correct aws keys \
+          configured.')
+        return
+
     __remove_iamRole(awssetup, cloudBlueprint)
     __remove_dynamodb(awssetup, cloudBlueprint)
     __remove_apiGateway(awssetup, cloudBlueprint)

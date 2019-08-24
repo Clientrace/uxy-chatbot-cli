@@ -27,8 +27,6 @@ def _check_app_updates(config, cloudBlueprint, environment):
   :type environment: configparser object
   """
 
-  # compare checksums
-
   changeControl = ChangeControl(os.getcwd(), config)
   cloudBlueprintCopy = copy.deepcopy(cloudBlueprint)
   cloudCheckSums = cloudBlueprintCopy['checksums']
@@ -229,5 +227,4 @@ def deploy(deploymentStage):
 
   
 
-  
   

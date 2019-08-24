@@ -24,9 +24,18 @@ class ProjectSetupTest(unittest.TestCase):
     projsetup.clone()
 
   
+  @unittest.skip('temporary skip')
   def test_add_config(self):
     projsetup = ProjSetup(self.appConfig)
     projsetup.add_app_config()
+
+
+  def test_create_dist(self):
+    projectsteup = ProjSetup(self.appConfig)
+    projectsteup.create_dist()
+
+
+
 
 
 

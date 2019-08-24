@@ -39,6 +39,7 @@ def _project_setup():
   projsetup.clone()
   projsetup.add_app_config()
   projsetup.install_dependencies()
+  projsetup.create_dist()
 
 
 def _save_project_blueprint(key, value):
@@ -92,7 +93,6 @@ def _aws_setup():
   print('Creating AWS Resources...')
   awssetup = AWSSetup(_appconfig)
   awssetup.setup_dynamodb_table()
-
 
   s3Status = _create_s3_bucket(awssetup)
   if( not s3Status ):
@@ -160,15 +160,15 @@ def _setup_(appname, runtime, description, stage, region):
   _save_project_blueprint('deployment:count',0)
 
   _project_setup()
-  apigateway = _aws_setup()
-  if( not apigateway ):
-    print('Project setup aborted.')
-    return
+  # apigateway = _aws_setup()
+  # if( not apigateway ):
+  #   print('Project setup aborted.')
+  #   return
 
-  print('==> Project successfully created!')
-  print('API Invocation URL: '+apigateway['invokeURL'])
-  print('Use this url to integrate with a facebook app.')
-  print('Deploy project with: uxy deploy --[stage]')
+  # print('==> Project successfully created!')
+  # print('API Invocation URL: '+apigateway['invokeURL'])
+  # print('Use this url to integrate with a facebook app.')
+  # print('Deploy project with: uxy deploy --[stage]')
 
 
 

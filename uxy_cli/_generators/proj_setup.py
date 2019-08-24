@@ -29,15 +29,15 @@ class ProjSetup:
     if( self.config['verbosity'] ):
       print('[SETUP] : '+msg)
 
-
   def create_dist(self):
     """
     Create APP Distributable
     """
 
-    distPath = self.config['app:name']+'/.tmp/dist'
+    self.log('Creating Dist Package...')
+    distPath = self.config['app:name']+'/.tmp/dist/'
     if( not os.path.exists(distPath) ):
-      os.mkdir(distPath)
+      os.makedirs(distPath)
 
     for root, dirs, files in os.walk(self.config['app:name']):
       for file in files:
@@ -46,14 +46,35 @@ class ProjSetup:
           continue
         if( '.tmp/' in fDir ):
           continue
+        fpath = fDir.replace(self.config['app:name']+'/','')
+        froot = root.replace(self.config['app:name']+'/','')
+        froot = root.replace(self.config['app:name'],'')
+
+        if( not os.path.exists(distPath+froot) ):
+          os.makedirs(distPath+froot)
+
+        shutil.copyfile(fDir, distPath+fpath)
+
+    for root, dirs, files in os.walk(self.config['app:name']+'/.tmp/dependencies'):
+      for file in files:
+        fDir = os.path.join(root, file)
+        fpath = fDir.replace(self.config['app:name']+'/.tmp/dependencies/','')
+        froot = root.replace(self.config['app:name']+'/.tmp/dependencies/','')
+
+        if( not os.path.exists(distPath+froot) ):
+          os.makedirs(distPath+froot)
+
+        shutil.copyfile(fDir, distPath+fpath)
 
   def install_dependencies(self):
     """
     Install project dependencies
     """
-    distPath = self.config['app:name']+'/.tmp/dist'
+
+    self.log('Installing dependencies...')
+    distPath = self.config['app:name']+'/.tmp/dependencies'
     if( not os.path.exists(distPath) ):
-      os.mkdir(distPath)
+      os.makedirs(distPath)
       os.system('pip3 install --system --prefix= requests -t '+distPath)
 
   def add_app_config(self):

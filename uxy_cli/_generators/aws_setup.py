@@ -358,7 +358,7 @@ class AWSSetup:
     if( not os.path.exists(config['app:name']+'/.tmp') ):
       os.mkdir(config['app:name']+'/.tmp')
       AWSSetup._compress_app_package(
-        config['app:name'],
+        config['app:name']+'/.tmp/dist',
         config['app:name']+'/.tmp/dist.zip'
       )
 
@@ -419,7 +419,7 @@ class AWSSetup:
       os.remove('.tmp/dist.zip')
 
     AWSSetup._compress_app_package(
-      os.getcwd(),
+      os.getcwd()+'/.tmp/dist',
       os.getcwd()+'/.tmp/dist.zip'
     )
     

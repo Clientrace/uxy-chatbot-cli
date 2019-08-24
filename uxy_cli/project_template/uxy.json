@@ -28,7 +28,7 @@
       "wcu" : 5,
       "rcu" : 5
     },
-    "lambda:handler" : "index.py",
+    "lambda:handler" : "index.lambda_handler",
     "lambda:timeout" : 500,
     "iam:roles" : [ 
       "arn:aws:iam::aws:policy/AmazonSQSFullAccess",

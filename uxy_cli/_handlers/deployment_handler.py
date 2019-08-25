@@ -195,12 +195,14 @@ def setup_fb_bot(environment, config):
 
   return awssetup, cloudBlueprint, newChecksums
 
+
 def create_dist():
   """
   Create APP Distributable
   """
 
   distPath = '.tmp/dist/'
+  shutil.rmtree(distPath)
   for root, dirs, files in os.walk(os.getcwd()):
     for file in files:
       fDir = os.path.join(root, file)
@@ -258,7 +260,5 @@ def deploy(deploymentStage):
   cloudBlueprint['checksums'] = newChecksums
   cloudBlueprint['deployment:count'] = cloudBlueprint['deployment:count'] + 1
   awssetup.save_cloud_config(cloudBlueprint)
-
-  
 
   

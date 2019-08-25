@@ -624,7 +624,7 @@ class AWSSetup:
 
     AWSSetup._log('+ Deploying API...')
     response = AWSSetup._deploy_api(restApiId, _apiGateway, config)
-    invokeURL = 'https://'+restApiId+'execute-api.'\
+    invokeURL = 'https://'+restApiId+'.execute-api.'\
       +config['aws:config']['region']+'.amazonaws.com/v'\
       +config['app:version']+'/uxy-webhook'
 

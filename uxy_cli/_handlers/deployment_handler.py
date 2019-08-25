@@ -11,6 +11,7 @@ import json
 import copy
 import configparser
 import hashlib
+import shutil
 from uxy_cli._handlers.change_control import ChangeControl
 from uxy_cli._handlers.fb_bot_setup import FBBotSetup
 from uxy_cli._validators.appconfig_validator import AppConfigValidator
@@ -193,6 +194,39 @@ def setup_fb_bot(environment, config):
           _chatbot_setup(config, environment, 'APP_DESCRIPTION', fbBotSetup)
 
   return awssetup, cloudBlueprint, newChecksums
+
+def create_dist():
+  """
+  Create APP Distributable
+  """
+
+  distPath = '.tmp/dist/'
+  for root, dirs, files in os.walk(os.getcwd()):
+    for file in files:
+      fDir = os.path.join(root, file)
+      if( '.git/' in fDir ):
+        continue
+      if( '.tmp/' in fDir ):
+        continue
+      fpath = fDir.replace(os.getcwd()+'/','')
+      froot = root.replace(os.getcwd()+'/','')
+      froot = root.replace(os.getcwd,'')
+
+      if( not os.path(distPath+froot) ):
+        os.makedirs(distPath+froot)
+
+      shutil.copyfile(fDir, distPath+fpath)
+
+  for root, dirs, files in os.walk(os.getcwd()+'/.tmp/dependencies'):
+    for file in files:
+      fDir = os.path.join(root, file)
+      fpath = fDir.replace(os.getcwd()+'/.tmp/dependencies','')
+      froot = root.replace(os.getcwd()+'/.tmp/dependencies','')
+
+      if( not os.path.exists(distPath+froot) ):
+        os.makedirs(distPath+froot)
+
+      shutil.copyfile(fDir, distPath+fpath)
 
 def deploy(deploymentStage):
   """

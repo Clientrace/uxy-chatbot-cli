@@ -636,6 +636,31 @@ class AWSSetup:
     }
 
   @staticmethod
+  def _put_integration_resp(restApiId, resourceId, httpMethod, statusCode,\
+    _apiGateway):
+    """
+    Put API Gateway integration response
+    :param restApiId: API Gateway rest api Id
+    :type restApiId: string
+    :param resourceId: API Gateway resource Id
+    :type resourceId: string
+    :param httpMethod: HTTP Method
+    :type httpMethod: string
+    :param statusCode: http status
+    :type statusCode: string
+    :param _apiGateway: API Gateway instance
+    :type _apiGateway: boto3 object
+    """
+
+    response = _apiGateway.put_integration_response(
+      restApiId = restApiId,
+      resourceId = resourceId,
+      httpMethod = httpMethod,
+      statusCode = statusCode
+    )
+    return response
+
+  @staticmethod
   def _get_stream_name(groupname, _logs):
     """
     Get AWS Stream name

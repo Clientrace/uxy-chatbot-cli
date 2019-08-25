@@ -48,7 +48,7 @@ class AWSSetupTest(unittest.TestCase):
     # Removes Initial File
     if( os.path.isfile(appPackageDest) ):
       os.remove(appPackageDest)
-    AWSSetup._compress_app_package(appPackageDir, appPackageDest)
+    AWSSetup._compress_app_package(appPackageDir, appPackageDest,[])
     self.assertTrue( os.path.isfile(appPackageDest) )
     # os.remove(appPackageDest)
 

@@ -202,7 +202,10 @@ def create_dist():
   """
 
   distPath = '.tmp/dist/'
-  shutil.rmtree(distPath)
+  if( os.path.exists(distPath) ):
+    shutil.rmtree(distPath)
+    os.makedirs(distPath)
+
   for root, dirs, files in os.walk(os.getcwd()):
     for file in files:
       fDir = os.path.join(root, file)
@@ -212,9 +215,9 @@ def create_dist():
         continue
       fpath = fDir.replace(os.getcwd()+'/','')
       froot = root.replace(os.getcwd()+'/','')
-      froot = root.replace(os.getcwd,'')
+      froot = root.replace(os.getcwd(),'')
 
-      if( not os.path(distPath+froot) ):
+      if( not os.path.exists(distPath+froot) ):
         os.makedirs(distPath+froot)
 
       shutil.copyfile(fDir, distPath+fpath)
@@ -244,16 +247,17 @@ def deploy(deploymentStage):
     return
 
   # Validate App Config
-  try:
-    config, deploymentStage = load_config_json(deploymentStage)
-    _file_replacements(deploymentStage, config)
-    environment = load_env_vars()
-    awssetup, cloudBlueprint, newChecksums = setup_fb_bot(environment, config)
-    awssetup.update_lambda()
-  except Exception as e:
-    print(str(e))
-    print('==> Deployment cancelled')
-    return
+  # try:
+  config, deploymentStage = load_config_json(deploymentStage)
+  _file_replacements(deploymentStage, config)
+  environment = load_env_vars()
+  awssetup, cloudBlueprint, newChecksums = setup_fb_bot(environment, config)
+  create_dist()
+  awssetup.update_lambda()
+  # except Exception as e:
+  #   print(str(e))
+  #   print('==> Deployment cancelled')
+  #   return
 
 
   print('Updating appilcation blueprint...')

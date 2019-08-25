@@ -276,7 +276,7 @@ class AWSSetup:
     return roleArn
 
   @staticmethod
-  def _compress_app_package(appPackageDir, appPackageDest):
+  def _compress_app_package(appPackageDir, appPackageDest, ignoreList):
     """
     Compress Folder Directory using ZipFile
     :param appPackageDir: app package directory
@@ -294,10 +294,15 @@ class AWSSetup:
       for file in files:
         fDir = os.path.join(root, file)
         # Ignore Git
-        if( '.git/' in fDir ):
+        ignore = False
+        for item in ignoreList:
+          if( item in fDir ):
+            ignore = True
+            break
+
+        if( ignore ):
           continue
-        if( '.tmp/' in fDir ):
-          continue
+
         zipf.write(
           filename = fDir,
           arcname = fDir.replace(appPackageDir,'')
@@ -359,7 +364,8 @@ class AWSSetup:
       os.mkdir(config['app:name']+'/.tmp')
       AWSSetup._compress_app_package(
         config['app:name']+'/.tmp/dist',
-        config['app:name']+'/.tmp/dist.zip'
+        config['app:name']+'/.tmp/dist.zip',
+        ['.git/','.tmp/']
       )
 
     funcName = appName+'-uxy-app-'+config['app:stage']
@@ -420,7 +426,8 @@ class AWSSetup:
 
     AWSSetup._compress_app_package(
       os.getcwd()+'/.tmp/dist',
-      os.getcwd()+'/.tmp/dist.zip'
+      os.getcwd()+'/.tmp/dist.zip',
+      ['.git/']
     )
     
     funcName = appname+'-uxy-app-'+config['app:stage']

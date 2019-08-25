@@ -247,17 +247,17 @@ def deploy(deploymentStage):
     return
 
   # Validate App Config
-  # try:
-  config, deploymentStage = load_config_json(deploymentStage)
-  _file_replacements(deploymentStage, config)
-  environment = load_env_vars()
-  awssetup, cloudBlueprint, newChecksums = setup_fb_bot(environment, config)
-  create_dist()
-  awssetup.update_lambda()
-  # except Exception as e:
-  #   print(str(e))
-  #   print('==> Deployment cancelled')
-  #   return
+  try:
+    config, deploymentStage = load_config_json(deploymentStage)
+    _file_replacements(deploymentStage, config)
+    environment = load_env_vars()
+    awssetup, cloudBlueprint, newChecksums = setup_fb_bot(environment, config)
+    create_dist()
+    awssetup.update_lambda()
+  except Exception as e:
+    print(str(e))
+    print('==> Deployment cancelled')
+    return
 
 
   print('Updating appilcation blueprint...')

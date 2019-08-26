@@ -362,10 +362,12 @@ class AWSSetup:
 
     if( not os.path.exists(config['app:name']+'/.tmp') ):
       os.mkdir(config['app:name']+'/.tmp')
+
+    if( not os.path.isfile(config['app:name']+'/.tmp/dist.zip') ):
       AWSSetup._compress_app_package(
         config['app:name']+'/.tmp/dist',
         config['app:name']+'/.tmp/dist.zip',
-        ['.git/','.tmp/']
+        ['.tmp/']
       )
 
     funcName = appName+'-uxy-app-'+config['app:stage']

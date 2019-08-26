@@ -13,7 +13,6 @@ from uxy_cli._generators.aws_setup import AWSSetup
 def getlogs():
   if( not os.path.isfile('uxy.json') ):
     print('Failed to locate app configuration file.')
-    print('==> Deployment cancelled.')
     return
 
   try:

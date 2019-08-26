@@ -622,16 +622,20 @@ class AWSSetup:
 
     AWSSetup._add_uxy_webhook_method(restApiId, webhookResourceId, 'POST',\
       lambdaARN, _apiGateway, config)
-    AWSSetup._put_integration_resp(restApiId, webhookResourceId, 'POST', '200',\
-       _apiGateway)
+
     AWSSetup._put_method_resp(restApiId, webhookResourceId, 'POST', '200',\
+       _apiGateway)
+
+    AWSSetup._put_integration_resp(restApiId, webhookResourceId, 'POST', '200',\
        _apiGateway)
 
     AWSSetup._add_uxy_webhook_method(restApiId, webhookResourceId, 'GET',\
       lambdaARN, _apiGateway, config, fbCallBackMapping)
-    AWSSetup._put_integration_resp(restApiId, webhookResourceId, 'GET', '200',\
-       _apiGateway)
+
     AWSSetup._put_method_resp(restApiId, webhookResourceId, 'GET', '200',\
+       _apiGateway)
+
+    AWSSetup._put_integration_resp(restApiId, webhookResourceId, 'GET', '200',\
        _apiGateway)
 
     AWSSetup._log('+ Deploying API...')
@@ -668,7 +672,10 @@ class AWSSetup:
       restApiId = restApiId,
       resourceId = resourceId,
       httpMethod = httpMethod,
-      statusCode = statusCode
+      statusCode = statusCode,
+      responseParameters = {
+        "method.response.header.Access-Control-Allow-Origin" : "'*'"
+      }
     )
     return response
 
@@ -693,7 +700,13 @@ class AWSSetup:
       restApiId = restApiId, 
       resourceId = resourceId,
       httpMethod = httpMethod,
-      statusCode = statusCode
+      statusCode = statusCode,
+      responseParameters = {
+        'method.response.header.Access-Control-Allow-Origin' : False
+      },
+      responseModels = {
+        'application/json' : 'Empty'
+      }
     )
     return response
 

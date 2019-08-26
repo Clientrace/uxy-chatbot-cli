@@ -675,6 +675,9 @@ class AWSSetup:
       statusCode = statusCode,
       responseParameters = {
         "method.response.header.Access-Control-Allow-Origin" : "'*'"
+      },
+      responseTemplates = {
+        "application/json" : ""
       }
     )
     return response

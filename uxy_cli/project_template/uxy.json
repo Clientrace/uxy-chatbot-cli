@@ -35,7 +35,8 @@
       "arn:aws:iam::aws:policy/AWSLambdaFullAccess",
       "arn:aws:iam::aws:policy/CloudWatchFullAccess",
       "arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess",
-      "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+      "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
+      "arn:aws:iam::aws:policy/service-role/AWSLambdaRole"
     ]
   },
   "chatbot:config": {

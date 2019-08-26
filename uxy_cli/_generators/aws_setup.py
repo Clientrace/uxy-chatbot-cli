@@ -346,6 +346,30 @@ class AWSSetup:
     return AWSSetup.FUNCTION_GET_ERROR
 
   @staticmethod
+  def _add_function_permission(appName, _lambda, config):
+    """
+    Add lambda function permission
+    :param appName: application name
+    :type appName: string
+    :param _lambda: boto3 lambda client instance
+    :type _lambda: boto3 object
+    :param config: application configuration
+    :returns: aws response
+    :returns: aws response
+    :rtype: dictionary
+    """
+
+    funcName = appName+'-uxy-app-'+config['app:stage']
+    resp = _lambda.add_permission(
+      FunctionName = funcName,
+      StatementId = '1',
+      Principal = 'apigateway.amazonaws.com',
+      Action = 'lambda:InvokeFunction'
+    )
+    return resp
+
+
+  @staticmethod
   def _generate_lambda(appName, _lambda, roleARN, config):
     """
     Creates AWS lambda function and uploads app template
@@ -395,6 +419,7 @@ class AWSSetup:
         Timeout = config['aws:config']['lambda:timeout']
       )
       AWSSetup._log("=> Lambda package deployed")
+      AWSSetup._add_function_permission(appName, _lambda, config)
     elif ( statusCode == AWSSetup.FUNCTION_FOUND ):
       AWSSetup._log('+ Updating lambda function...')
       response = _lambda.update_function_code(
@@ -402,6 +427,7 @@ class AWSSetup:
         ZipFile = zipFileBin
       )
       AWSSetup._log("=> Lambda package deployed")
+      AWSSetup._add_function_permission(appName, _lambda, config)
     else:
       AWSSetup._log('=> ERROR: error getting lambda function')
       response = {}

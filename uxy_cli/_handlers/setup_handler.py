@@ -67,6 +67,7 @@ def _create_lambda(awssetup, iamRoleARN):
       lambdaARN = awssetup.package_lambda(iamRoleARN)
       break
     except Exception as e:
+      print(str(e))
       print('IAM Resource not yet available, Retrying Lambda Creation...')
       pass
     time.sleep(5)
@@ -155,20 +156,22 @@ def _setup_(appname, runtime, description, stage, region):
   _save_project_blueprint('app:region', region)
   _save_project_blueprint('app:description', _appconfig['app:description'])
   _save_project_blueprint('iam:roles', _appconfig['aws:config']['iam:roles'])
-  _save_project_blueprint('chatbot:menu', _appconfig['chatbot:config']['persistent_menu'])
-  _save_project_blueprint('chatbot:url_whitelist', _appconfig['chatbot:config']['URLsToWhiteList'])
+  _save_project_blueprint('chatbot:menu',\
+     _appconfig['chatbot:config']['persistent_menu'])
+  _save_project_blueprint('chatbot:url_whitelist',\
+     _appconfig['chatbot:config']['URLsToWhiteList'])
   _save_project_blueprint('deployment:count',0)
 
   _project_setup()
-  # apigateway = _aws_setup()
-  # if( not apigateway ):
-  #   print('Project setup aborted.')
-  #   return
+  apigateway = _aws_setup()
+  if( not apigateway ):
+    print('Project setup aborted.')
+    return
 
-  # print('==> Project successfully created!')
-  # print('API Invocation URL: '+apigateway['invokeURL'])
-  # print('Use this url to integrate with a facebook app.')
-  # print('Deploy project with: uxy deploy --[stage]')
+  print('==> Project successfully created!')
+  print('API Invocation URL: '+apigateway['invokeURL'])
+  print('Use this url to integrate with a facebook app.')
+  print('Deploy project with: uxy deploy --[stage]')
 
 
 

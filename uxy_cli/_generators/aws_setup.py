@@ -584,6 +584,7 @@ class AWSSetup:
         integrationHttpMethod = 'POST',
         uri = lambdaMethodURI
       )
+
     return response
 
   @staticmethod
@@ -619,8 +620,17 @@ class AWSSetup:
 
     AWSSetup._add_uxy_webhook_method(restApiId, webhookResourceId, 'POST',\
       lambdaARN, _apiGateway, config)
+    AWSSetup._put_integration_resp(restApiId, webhookResourceId, 'POST', '200',\
+       _apiGateway)
+    AWSSetup._put_method_resp(restApiId, webhookResourceId, 'POST', '200',\
+       _apiGateway)
+
     AWSSetup._add_uxy_webhook_method(restApiId, webhookResourceId, 'GET',\
       lambdaARN, _apiGateway, config, fbCallBackMapping)
+    AWSSetup._put_integration_resp(restApiId, webhookResourceId, 'GET', '200',\
+       _apiGateway)
+    AWSSetup._put_method_resp(restApiId, webhookResourceId, 'GET', '200',\
+       _apiGateway)
 
     AWSSetup._log('+ Deploying API...')
     response = AWSSetup._deploy_api(restApiId, _apiGateway, config)
@@ -654,6 +664,31 @@ class AWSSetup:
 
     response = _apiGateway.put_integration_response(
       restApiId = restApiId,
+      resourceId = resourceId,
+      httpMethod = httpMethod,
+      statusCode = statusCode
+    )
+    return response
+
+
+  @staticmethod
+  def _put_method_resp(restApiId, resourceId, httpMethod, statusCode, \
+    _apiGateway):
+    """
+    Put API Gateway integration response
+    :param restApiId: API Gateway rest api Id
+    :type restApiId: string
+    :param resourceId: API Gateway resource Id
+    :type resourceId: string
+    :param httpMethod: HTTP Method
+    :type httpMethod: string
+    :param statusCode: http status
+    :type statusCode: string
+    :param _apiGateway: API Gateway instance
+    :type _apiGateway: boto3 object
+    """
+    response = _apiGateway.put_method_response(
+      restApiId = restApiId, 
       resourceId = resourceId,
       httpMethod = httpMethod,
       statusCode = statusCode

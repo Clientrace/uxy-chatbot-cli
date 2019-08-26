@@ -791,7 +791,8 @@ class AWSSetup:
     """
     Get cloudwatch events
     """
-    groupname = '/aws/lambda/'+self.config['app:name']
+    groupname = '/aws/lambda/'+self.config['app:name']+'-uxy-app-'\
+      +self.config['app:stage']
     streams = AWSSetup._get_log_stream(groupname, self._logs)
     streamLogs = ''
     if( streams ):

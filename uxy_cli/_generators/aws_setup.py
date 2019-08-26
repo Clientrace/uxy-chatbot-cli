@@ -367,7 +367,7 @@ class AWSSetup:
       AWSSetup._compress_app_package(
         config['app:name']+'/.tmp/dist',
         config['app:name']+'/.tmp/dist.zip',
-        ['.tmp/']
+        ['.git/']
       )
 
     funcName = appName+'-uxy-app-'+config['app:stage']

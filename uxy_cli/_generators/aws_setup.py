@@ -640,14 +640,14 @@ class AWSSetup:
       _apiGateway)
     webhookResourceId = response['id']
 
-    fbCallBackMapping = {
-      "application/json" : "{\"hub.mode\":\"$input.params('hub.mode')\",\
-      \"hub.challenge\":\"$input.params('hub.challenge')\",\
-      \"hub.verify_token\":\"$input.params('hub.verify_token')\"}"
+    mappingTemplate = {
+      "http_method" : "$context.httpMethod",
+      "body" : "$input.json('$')",
+      "query_params" : "$input.params()"
     }
 
     AWSSetup._add_uxy_webhook_method(restApiId, webhookResourceId, 'POST',\
-      lambdaARN, _apiGateway, config)
+      lambdaARN, _apiGateway, config, mappingTemplate)
 
     AWSSetup._put_method_resp(restApiId, webhookResourceId, 'POST', '200',\
        _apiGateway)
@@ -656,7 +656,7 @@ class AWSSetup:
        _apiGateway)
 
     AWSSetup._add_uxy_webhook_method(restApiId, webhookResourceId, 'GET',\
-      lambdaARN, _apiGateway, config, fbCallBackMapping)
+      lambdaARN, _apiGateway, config, mappingTemplate)
 
     AWSSetup._put_method_resp(restApiId, webhookResourceId, 'GET', '200',\
        _apiGateway)

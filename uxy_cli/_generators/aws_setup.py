@@ -641,9 +641,8 @@ class AWSSetup:
     webhookResourceId = response['id']
 
     mappingTemplate = {
-      "http_method" : "$context.httpMethod",
-      "body" : "$input.json('$')",
-      "query_params" : "$input.params()"
+      "application/json" : '{\n    "http_method": "$context.httpMethod",\n    \
+      "body": "$input.json(\'$\')",\n    "query_params": "$input.params()"\n}'
     }
 
     AWSSetup._add_uxy_webhook_method(restApiId, webhookResourceId, 'POST',\

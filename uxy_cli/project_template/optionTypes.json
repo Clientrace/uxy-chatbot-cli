@@ -1,3 +1,19 @@
 {
-
+  "quick_reply" : {
+    "data" : "", "syns" : []
+  },
+  "btn" : {
+    "postback" : {
+      "type" : "postback", "buttonName": "", "syns" : []
+    },
+    "web_url" : {
+      "type" : "web_url", 
+      "buttonName" : "", 
+      "url" : "", 
+      "size": "",
+      "webview" : false
+    }
+  }
 }
+
+

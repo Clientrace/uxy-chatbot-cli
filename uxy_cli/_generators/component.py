@@ -7,6 +7,9 @@ Documented via reST
 Uxy Component Generator
 """
 
+import os
+import json
+
 class ComponentGenerator:
   """
   Generates spiel and unit component
@@ -21,6 +24,7 @@ class ComponentGenerator:
 
     ComponentGenerator.verbosity = config['verbosity']
     self.config = config
+    self.templateDir = os.getcwd()+'/uxy_cli/project_template'
 
   @classmethod
   def _log(cls, msg):
@@ -32,10 +36,16 @@ class ComponentGenerator:
     if( cls.verbosity ):
       print('[AWS]: ' + msg)
 
-  def generate_spiel(self):
+  def generate_spiel(self, acceptTypes):
     """
     Generate uxy chatbot spiel
     """
+
+    tempDir = self.templateDir+'/spiel.json'
+    template = json.loads(open(tempDir).read())
+    template['acceptTypes'] = acceptTypes
+
+
 
 
 

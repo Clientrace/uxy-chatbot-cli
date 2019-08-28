@@ -1,0 +1,43 @@
+{
+  "acceptTypes" : [{
+    "_rule" : {
+      "type" : "string",
+      "value" : {
+        "set" : "predefined",
+        "type" : "any",
+        "lists" : [
+          "any",
+          "payload",
+          "attachment",
+          "text"
+        ]
+      }
+    }
+  }],
+  "content" : [{
+    "_rule" : {
+      "type" : "string",
+      "value" : {
+        "set" : "custom",
+        "type" : "any"
+      }
+    }
+  }],
+  "optionType" : {
+    "_rule" : {
+      "type" : "string",
+      "value" : {
+        "set" : "predefined",
+        "type" : "any",
+        "lists" : [
+          "btn",
+          "quick_reply"
+        ]
+      }
+    }
+  },
+  "options" : [{
+
+  }],
+  "retries" : null
+}

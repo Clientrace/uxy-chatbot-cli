@@ -34,6 +34,13 @@ class ProjSetup:
     Create APP Distributable
     """
 
+    # Generate README
+    readmeTemplate = open(os.getcwd()+'/project_template/README.md').read()
+    readmeTemplate = readmeTemplate.replace(':appname:',self.config['app:name'])
+    readmeFile = open(self.config['app:name']+'/README.md','w')
+    readmeFile.write(readmeTemplate)
+    readmeFile.close()
+
     self.log('Creating Dist Package...')
     distPath = self.config['app:name']+'/.tmp/dist/'
     if( not os.path.exists(distPath) ):

@@ -17,6 +17,27 @@ from uxy_cli._handlers.fb_bot_setup import FBBotSetup
 from uxy_cli._validators.appconfig_validator import AppConfigValidator
 from uxy_cli._generators.aws_setup import AWSSetup
 
+def compile_spiels(path):
+  """
+  Compile Chatbot Spiels
+  :param path: content path
+  :type path: string
+  :returns: combiled spiels json
+  :rtype: dictionary
+  """
+  contentPath = path+'/src/content/spiels/'
+  print(contentPath)
+
+  spiels = {}
+  for root, dirs, files in os.walk(contentPath):
+    for file in files:
+      fDir = os.path.join(root, file)
+      spielFile = open(fDir).read()
+      jsonContent = json.loads(spielFile)
+      spiels = dict(spiels.items(), **jsonContent)
+
+  return spiels
+
 def _check_app_updates(config, cloudBlueprint, environment):
   """
   Check application updates for deployment
@@ -206,12 +227,21 @@ def create_dist():
     shutil.rmtree(distPath)
     os.makedirs(distPath)
 
+  
+  spiels = compile_spiels(os.getcwd())
+  os.makedirs(distPath+'src/content/spiels/')
+  spielFile = open(distPath+'src/content/spiels/displays.json','w')
+  spielFile.write(json.dumps(spiels,indent=4))
+  spielFile.close()
+
   for root, dirs, files in os.walk(os.getcwd()):
     for file in files:
       fDir = os.path.join(root, file)
       if( '.git/' in fDir ):
         continue
       if( '.tmp/' in fDir ):
+        continue
+      if( 'src/content/spiels/' in fDir):
         continue
       fpath = fDir.replace(os.getcwd()+'/','')
       froot = root.replace(os.getcwd()+'/','')

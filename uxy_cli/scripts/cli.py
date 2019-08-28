@@ -65,7 +65,7 @@ def purge():
 @click.option('-s','--stage')
 def info(stage):
   """
-  Get's chatbot info
+  Get chatbot info
   """
 
   info_handler.get_cloud_blueprint(stage)

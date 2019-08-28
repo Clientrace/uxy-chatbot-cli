@@ -35,7 +35,8 @@ class ProjSetup:
     """
 
     # Generate README
-    readmeTemplate = open(os.getcwd()+'/project_template/README.md').read()
+    templatePath = uxy_cli.ROOT_DIR+'/project_template/README.md'
+    readmeTemplate = open(templatePath).read()
     readmeTemplate = readmeTemplate.replace(':appname:',self.config['app:name'])
     readmeFile = open(self.config['app:name']+'/README.md','w')
     readmeFile.write(readmeTemplate)

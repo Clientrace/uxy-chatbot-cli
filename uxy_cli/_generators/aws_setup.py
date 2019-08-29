@@ -207,6 +207,7 @@ class AWSSetup:
   @staticmethod
   def _load_s3_text_resource(appName, _s3, resourceName, config):
     """
+    Loads s3 text resource
     :param appName: application name
     :type appName: string
     :param _s3: aws s3 instance
@@ -221,6 +222,25 @@ class AWSSetup:
     s3Object = _s3.Object(s3BucketName, resourceName)
     content = s3Object.get()['Body'].read().decode('utf-8')
     return content
+
+
+  def s3_bucket_exists(self, _s3, bucketName):
+    """
+    Check if s3 bucket exists
+    :param  _s3: aws s3 instance
+    :type _s3: boto3 object
+    :param bucketName: s3 bucket name
+    :type bucketName: string
+    :returns: returns whether an s3 bucket exists
+    :rtype: boolean
+    """
+
+    try:
+      _s3.create_bucket(Bucket=bucketName)
+    except Exception as e:
+      print(str(e))
+      return False
+    return True
 
   @staticmethod
   def _generate_iam_role(appName, _iamClient, _iamRes, config):

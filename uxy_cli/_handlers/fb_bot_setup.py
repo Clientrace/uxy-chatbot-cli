@@ -62,7 +62,7 @@ class FBBotSetup:
     :rtype: boolean
     """
     FBBotSetup._log("Checking Page Token validity...")
-    URL = self.HOST_URL+'/me?access_token='+self.accessToken
+    URL = self.HOST_URL+'/me/messenger_profile?access_token='+self.accessToken
     resp = requests.get(URL)
     if( resp.status_code == 200 ):
       return True

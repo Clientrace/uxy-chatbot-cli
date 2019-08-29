@@ -279,6 +279,12 @@ def deploy(deploymentStage):
   # Validate App Config
   try:
     config, deploymentStage = load_config_json(deploymentStage)
+    if( deploymentStage != 'dev' ):
+      # Check if s3 bucket exists
+      # TODO CHECK S3 EXISTS
+      pass
+
+
     _file_replacements(deploymentStage, config)
     environment = load_env_vars()
     awssetup, cloudBlueprint, newChecksums = setup_fb_bot(environment, config)

@@ -125,6 +125,12 @@ def _aws_setup():
   return restApi
 
 
+def _setup_deployment_stage(config, stage):
+  """
+  Setup aws deployment stage
+  """
+  pass
+
 def _setup_(appname, runtime, description, stage, region):
   """
   Setup AWS Resources needed

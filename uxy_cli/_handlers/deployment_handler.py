@@ -16,6 +16,7 @@ from uxy_cli._handlers.change_control import ChangeControl
 from uxy_cli._handlers.fb_bot_setup import FBBotSetup
 from uxy_cli._validators.appconfig_validator import AppConfigValidator
 from uxy_cli._generators.aws_setup import AWSSetup
+from uxy_cli._handlers import setup_handler
 
 def compile_spiels(path):
   """
@@ -181,7 +182,7 @@ def load_env_vars():
   return environment
 
 
-def setup_fb_bot(environment, config):
+def setup_fb_bot(environment, awssetup, config):
   """
   Setup facebook chatbot
   """
@@ -189,7 +190,6 @@ def setup_fb_bot(environment, config):
   if( not fbBotSetup.check_token_validity() ):
     raise Exception('s3 bucket name not available.')
 
-  awssetup = AWSSetup(config)
   cloudBlueprint = awssetup.load_cloud_config()
 
   print('Checking app updates...')
@@ -214,7 +214,7 @@ def setup_fb_bot(environment, config):
         if( config['app:description'] != cloudBlueprint['app:description'] ):
           _chatbot_setup(config, environment, 'APP_DESCRIPTION', fbBotSetup)
 
-  return awssetup, cloudBlueprint, newChecksums
+  return cloudBlueprint, newChecksums
 
 
 def create_dist():
@@ -263,6 +263,13 @@ def create_dist():
 
       shutil.copyfile(fDir, distPath+fpath)
 
+def create_deployment_stage(stage, awssetup, config):
+  """
+  Creates new deployment stage
+  """
+  print("Creating new deployment stage..")
+  setup_handler._setup_deployment_stage(config, stage)
+
 def deploy(deploymentStage):
   """
   Deploy chatbot project
@@ -279,15 +286,17 @@ def deploy(deploymentStage):
   # Validate App Config
   try:
     config, deploymentStage = load_config_json(deploymentStage)
-    if( deploymentStage != 'dev' ):
-      # Check if s3 bucket exists
-      # TODO CHECK S3 EXISTS
-      pass
-
-
     _file_replacements(deploymentStage, config)
     environment = load_env_vars()
-    awssetup, cloudBlueprint, newChecksums = setup_fb_bot(environment, config)
+    awssetup = AWSSetup(config)
+
+    if( deploymentStage != 'dev' ):
+      # Check if s3 bucket exists
+      if( not awssetup.s3_bucket_exists(config['app:name']+'-uxy-app-'\
+        +deploymentStage) ):
+        create_deployment_stage(deploymentStage, awssetup, config)
+
+    cloudBlueprint, newChecksums = setup_fb_bot(environment, awssetup, config)
     create_dist()
     awssetup.update_lambda()
   except Exception as e:

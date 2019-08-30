@@ -38,6 +38,7 @@ class AWSSetupTest(unittest.TestCase):
 
 
 
+  @unittest.skip('Skip')
   def test_package_compression(self):
     """
     Test Zip compressor
@@ -101,7 +102,13 @@ class AWSSetupTest(unittest.TestCase):
     # awsSetup.remove_iamrole('testbot-uxy-app')
     # awsSetup.remove_lambda('testbot-uxy-app')
 
-    
+  def test_s3_bucket_exist(self):
+    """
+    Test S3 Bucket Exists
+    """
+
+    awsSetup = AWSSetup(self.appConfig)
+    self.assertTrue(not awsSetup.s3_bucket_exists('test123'))
 
 if __name__ == '__main__':
   unittest.main()

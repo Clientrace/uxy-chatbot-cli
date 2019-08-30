@@ -224,11 +224,9 @@ class AWSSetup:
     return content
 
 
-  def s3_bucket_exists(self, _s3, bucketName):
+  def s3_bucket_exists(self, bucketName):
     """
     Check if s3 bucket exists
-    :param  _s3: aws s3 instance
-    :type _s3: boto3 object
     :param bucketName: s3 bucket name
     :type bucketName: string
     :returns: returns whether an s3 bucket exists
@@ -236,7 +234,7 @@ class AWSSetup:
     """
 
     try:
-      _s3.create_bucket(Bucket=bucketName)
+      self._s3Res.meta.client.head_bucket(Bucket=bucketName)
     except Exception as e:
       print(str(e))
       return False

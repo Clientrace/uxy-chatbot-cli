@@ -16,7 +16,6 @@ from uxy_cli._generators.aws_setup import AWSSetup
 from uxy_cli._generators.proj_setup import ProjSetup
 from uxy_cli._handlers.change_control import ChangeControl
 
-global ROOT_DIR
 global _appconfig
 global _awssetup
 global _projsetup
@@ -123,13 +122,6 @@ def _aws_setup():
   awssetup.save_cloud_config(_projectBlueprint)
 
   return restApi
-
-
-def _setup_deployment_stage(config, stage):
-  """
-  Setup aws deployment stage
-  """
-  pass
 
 def _setup_(appname, runtime, description, stage, region):
   """

@@ -99,6 +99,8 @@ def _aws_setup(config, region, projPath):
     'dynamodb:name' : dynamodbName,
     'iam:arn' : iamRoleARN,
     'iam:name' : appName + 'uxy-app',
+    'lambda:arn' : lambdaARN,
+    'lambda:name' : appName + '-uxy-app-' + stage,
     'restApi:id' : restApi['restApiId'],
     'restApi:invokeURL' : restApi['invokeURL'],
     's3:name' : appName + '-uxy-app-' + stage,

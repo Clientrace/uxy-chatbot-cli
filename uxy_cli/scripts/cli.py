@@ -12,7 +12,7 @@ import json
 import boto3
 import click
 import uxy_cli
-from uxy_cli._handlers import setup_handler2
+from uxy_cli._handlers import setup_handler
 from uxy_cli._handlers import cleanup_handler
 from uxy_cli._handlers import deployment_handler
 from uxy_cli._handlers import applogs_handler
@@ -48,7 +48,7 @@ def new(appname, runtime):
   appDesc = click.prompt('Description ', type=str)
   stage = click.prompt('Stage ', type=str, default='dev', show_default='dev')
   region = click.prompt('Region ', type=str, default=default_region, show_default=default_region)
-  setup_handler2.setup(appname, runtime, appDesc, stage, region)
+  setup_handler.setup(appname, runtime, appDesc, stage, region)
 
 
 @cli.command('purge')

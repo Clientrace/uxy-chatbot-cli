@@ -13,6 +13,7 @@ import json
 import uuid
 import boto3
 import zipfile
+from botocore.exceptions import ClientError
 
 class AWSSetup:
   """
@@ -120,7 +121,7 @@ class AWSSetup:
     :returns: creation status
     :rtype: boolean
     """
-    status = False
+    status = True
     s3BucketName = appName+'-uxy-app-'+config['app:stage']
     AWSSetup._log('+ Creating s3 bucket...')
     try:
@@ -130,10 +131,13 @@ class AWSSetup:
           'LocationConstraint' : config['aws:config']['region']
         }
       )
-      status = True
     except Exception as e:
       if( '(OperationAborted)' in str(e) ):
         AWSSetup._log('Bucket name in on queue for deletion.')
+        status = False
+
+      if( '(EntityAlreadyExists)' in str(e) ):
+        AWSSetup._log('=> s3 bucket already exists')
 
     return status
 
@@ -236,9 +240,27 @@ class AWSSetup:
     try:
       self._s3Res.meta.client.head_bucket(Bucket=bucketName)
     except Exception as e:
-      print(str(e))
       return False
     return True
+
+
+  def s3_object_exists(self, bucketName, fileName):
+    """
+    Check if s3 file exists
+    :param bucketName: s3 bucket name
+    :type bucketName: string
+    :param fileName: s3 object name
+    :type fileName: string
+    :returns: returns if s3 file exists
+    :rtype: boolean
+    """
+    try:
+      self._s3Res.Object(bucketName, fileName).load()
+    except ClientError as e:
+      if( e.response['Error']['Code'] == '404' ):
+        return False
+    return True
+
 
   @staticmethod
   def _generate_iam_role(appName, _iamClient, _iamRes, config):
@@ -388,7 +410,7 @@ class AWSSetup:
 
 
   @staticmethod
-  def _generate_lambda(appName, _lambda, roleARN, config):
+  def _generate_lambda(appName, _lambda, roleARN, config, projPath):
     """
     Creates AWS lambda function and uploads app template
     :param appName: application name
@@ -398,22 +420,25 @@ class AWSSetup:
     :param roleARN: IAM Role
     :type roleARN: string
     :param config: application configuration
+    :type config: dictionary
+    :param projPath: project path
+    :type projPath: string
     :returns: aws response
     :rtype: dictionary
     """
 
-    if( not os.path.exists(config['app:name']+'/.tmp') ):
-      os.mkdir(config['app:name']+'/.tmp')
+    if( not os.path.exists(projPath+'/.tmp') ):
+      os.mkdir(projPath+'/.tmp')
 
-    if( not os.path.isfile(config['app:name']+'/.tmp/dist.zip') ):
+    if( not os.path.isfile(projPath+'/.tmp/dist.zip') ):
       AWSSetup._compress_app_package(
-        config['app:name']+'/.tmp/dist',
-        config['app:name']+'/.tmp/dist.zip',
+        projPath+'/.tmp/dist',
+        projPath+'/.tmp/dist.zip',
         ['.git/']
       )
 
     funcName = appName+'-uxy-app-'+config['app:stage']
-    zipFile = open(config['app:name']+'/.tmp/dist.zip', 'rb')
+    zipFile = open(projPath+'/.tmp/dist.zip', 'rb')
     zipFileBin = zipFile.read()
     zipFile.close()
 
@@ -898,14 +923,17 @@ class AWSSetup:
     )
 
 
-  def package_lambda(self, roleARN):
+  def package_lambda(self, roleARN, projPath):
     """
     Setup AWS Lambda
     :param roleARN: AWS IAM Role ARN
     :type roleARN: string
+    :param projPath: project path
+    :type projPath: string
     """
 
-    response = AWSSetup._generate_lambda(self.appName, self._lambda, roleARN, self.config)
+    response = AWSSetup._generate_lambda(self.appName, self._lambda, roleARN,\
+      self.config, projPath)
     return response['FunctionArn']
 
   def update_lambda(self):

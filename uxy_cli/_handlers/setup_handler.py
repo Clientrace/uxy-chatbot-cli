@@ -35,17 +35,19 @@ def _project_setup(config):
   projsetup.create_dist()
 
 
-def _create_lambda(awssetup, iamRoleARN):
+def _create_lambda(awssetup, iamRoleARN, projPath):
   """
   Wait for iam role until it is generated
   :param awssetup: Amazon Setup Module
   :type awssetp: AwsSetup Object
   :param iamRoleARN: iam role aws resouce name
   :type iamRoleARN: string
+  :param projPath: project path
+  :type projPath: string
   """
   while True:
     try:
-      lambdaARN = awssetup.package_lambda(iamRoleARN)
+      lambdaARN = awssetup.package_lambda(iamRoleARN, projPath)
       break
     except Exception as e:
       print(str(e))
@@ -65,7 +67,7 @@ def _create_s3_bucket(awssetup):
     print('Please use other application name..')
   return status
 
-def _aws_setup(config, region):
+def _aws_setup(config, region, projPath):
   """
   AWS Resource setup
   """
@@ -81,7 +83,7 @@ def _aws_setup(config, region):
   appName, stage = config['app:name'], config['app:stage']
   dynamodbName = appName + '-uxy-session-' + stage
   iamRoleARN = awssetup.setup_iamrole()
-  lambdaARN = _create_lambda(awssetup, iamRoleARN)
+  lambdaARN = _create_lambda(awssetup, iamRoleARN, projPath)
   restApi = awssetup.setup_uxy_api(lambdaARN)
   changeControl = ChangeControl(appName, config)
   checksums = changeControl.generate_filechecksums()
@@ -112,8 +114,9 @@ def setup_new_stage(config, stage):
   :param config: 
   """
 
-  _project_setup(config)
-  apigateway = _aws_setup(config, stage)
+  # Edit current deployment stage
+  config['app:stage'] = stage
+  apigateway = _aws_setup(config, stage, os.getcwd())
 
   if( not apigateway ):
     print('Project Setup Aborted..')
@@ -143,7 +146,7 @@ def setup(appname, runtime, description, stage, region):
   appconfig['aws:config']['region'] = region
   
   _project_setup(appconfig)
-  apigateway = _aws_setup(appconfig, region)
+  apigateway = _aws_setup(appconfig, region, appname)
 
   if( not apigateway ):
     print('Project Setup Aborted..')
@@ -158,6 +161,4 @@ def setup(appname, runtime, description, stage, region):
 
 
  
-
-
 

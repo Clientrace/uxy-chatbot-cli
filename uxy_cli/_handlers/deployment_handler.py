@@ -267,8 +267,31 @@ def create_deployment_stage(stage, awssetup, config):
   """
   Creates new deployment stage
   """
+
   print("Creating new deployment stage..")
   setup_handler.setup_new_stage(config, stage)
+
+
+def assess_deployment_stage(awssetup, config, stage):
+  """
+  Assess deployment stage if everything is already setup up before
+  """
+
+  # Create app configuration backup
+  shutil.copyfile('uxy.json', '.tmp/uxy.json')
+
+  bucketName = config['app:name'] + '-uxy-app-' + stage
+  config['app:stage'] = stage
+  configJsonFile = open('uxy.json','w')
+  configJsonFile.write(json.dumps(config, indent=2))
+  configJsonFile.close()
+
+  if( not awssetup.s3_bucket_exists(bucketName) ):
+    create_deployment_stage(stage, awssetup, config)
+  elif( not awssetup.s3_object_exists(bucketName, 'aws_blueprint.json') ):
+    print('Creating deployment stage')
+    create_deployment_stage(stage, awssetup, config)
+  
 
 def deploy(deploymentStage):
   """
@@ -292,9 +315,7 @@ def deploy(deploymentStage):
 
     if( deploymentStage != 'dev' ):
       # Check if s3 bucket exists
-      if( not awssetup.s3_bucket_exists(config['app:name']+'-uxy-app-'\
-        +deploymentStage) ):
-        create_deployment_stage(deploymentStage, awssetup, config)
+      assess_deployment_stage(awssetup, config, deploymentStage)
 
     cloudBlueprint, newChecksums = setup_fb_bot(environment, awssetup, config)
     create_dist()
@@ -303,7 +324,6 @@ def deploy(deploymentStage):
     print(str(e))
     print('==> Deployment cancelled')
     return
-
 
   print('Updating appilcation blueprint...')
   cloudBlueprint['checksums'] = newChecksums

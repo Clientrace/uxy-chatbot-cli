@@ -20,6 +20,8 @@ from uxy_cli._handlers.change_control import ChangeControl
 def _project_setup(config):
   """
   Initial Project Setup
+  :param config: app configuration
+  :type config: dictionary
   """
 
   fbVerifyToken = uuid.uuid4().hex
@@ -63,7 +65,7 @@ def _create_s3_bucket(awssetup):
     print('Please use other application name..')
   return status
 
-def _aws_setup(config):
+def _aws_setup(config, region):
   """
   AWS Resource setup
   """
@@ -86,7 +88,7 @@ def _aws_setup(config):
   
   projectBlueprint = {
     'app:name' : appName,
-    'app:region' : config['app:region'],
+    'app:region' : region,
     'app:description' : config['app:description'],
     'iam:roles' : config['aws:config']['iam:roles'],
     'chatbot:menu' : config['chatbot:config']['persistent_menu'],
@@ -104,6 +106,19 @@ def _aws_setup(config):
   awssetup.save_cloud_config(projectBlueprint)
   return restApi
 
+def setup_new_stage(config, stage):
+  """
+  Setup New AWS Stage
+  :param config: 
+  """
+
+  _project_setup(config)
+  apigateway = _aws_setup(config, stage)
+
+  if( not apigateway ):
+    print('Project Setup Aborted..')
+    return
+
 def setup(appname, runtime, description, stage, region):
   """
   Setup AWS Resources needed
@@ -116,7 +131,7 @@ def setup(appname, runtime, description, stage, region):
   :param stage: app stage, this also serves as the deployment env.
   :type stage: string
   :param region: aws region
-  :type regtion: string
+  :type region: string
   """
 
   appconfig = json.loads(open(uxy_cli.ROOT_DIR+'/project_template/uxy.json').read())
@@ -128,7 +143,7 @@ def setup(appname, runtime, description, stage, region):
   appconfig['aws:config']['region'] = region
   
   _project_setup(appconfig)
-  apigateway = _aws_setup(appconfig)
+  apigateway = _aws_setup(appconfig, region)
 
   if( not apigateway ):
     print('Project Setup Aborted..')

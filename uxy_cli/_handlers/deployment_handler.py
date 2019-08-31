@@ -268,7 +268,7 @@ def create_deployment_stage(stage, awssetup, config):
   Creates new deployment stage
   """
   print("Creating new deployment stage..")
-  setup_handler._setup_deployment_stage(config, stage)
+  setup_handler.setup_new_stage(config, stage)
 
 def deploy(deploymentStage):
   """

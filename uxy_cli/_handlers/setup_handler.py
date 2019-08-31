@@ -1,7 +1,7 @@
 """
 Authored by Kim Clarence Penaflor
 08/09//2019
-version 0.0.2
+version 0.0.3
 Documented via reST
 
 Project uxy cli setup command manager module
@@ -16,42 +16,24 @@ from uxy_cli._generators.aws_setup import AWSSetup
 from uxy_cli._generators.proj_setup import ProjSetup
 from uxy_cli._handlers.change_control import ChangeControl
 
-global _appconfig
-global _awssetup
-global _projsetup
-global _projectBlueprint
 
-_projectBlueprint = {}
-
-def _project_setup():
+def _project_setup(config):
   """
   Initial Project Setup
+  :param config: app configuration
+  :type config: dictionary
   """
 
-  global _appconfig
-
   fbVerifyToken = uuid.uuid4().hex
-  _appconfig['fb:verifyToken'] = fbVerifyToken
+  config['fb:verifyToken'] = fbVerifyToken
 
   print('Loading project...')
-  projsetup = ProjSetup(_appconfig)
+  projsetup = ProjSetup(config)
   projsetup.clone()
   projsetup.add_app_config()
   projsetup.install_dependencies()
   projsetup.create_dist()
 
-
-def _save_project_blueprint(key, value):
-  global _projectBlueprint
-  """
-  Saves project blueprint for backup
-  :param key: json key
-  :type key: string
-  :param value: json value
-  :type value: string
-  """
-
-  _projectBlueprint[key] = value
 
 def _create_lambda(awssetup, iamRoleARN):
   """
@@ -83,47 +65,61 @@ def _create_s3_bucket(awssetup):
     print('Please use other application name..')
   return status
 
-def _aws_setup():
+def _aws_setup(config, region):
   """
   AWS Resource setup
   """
-  global _appconfig
-  global _projectBlueprint
 
   print('Creating AWS Resources...')
-  awssetup = AWSSetup(_appconfig)
+  awssetup = AWSSetup(config)
   awssetup.setup_dynamodb_table()
 
   s3Status = _create_s3_bucket(awssetup)
   if( not s3Status ):
     return None
 
-  _save_project_blueprint('dynamodb:name', _appconfig['app:name']+'-uxy-session-'+_appconfig['app:stage'])
-
+  appName, stage = config['app:name'], config['app:stage']
+  dynamodbName = appName + '-uxy-session-' + stage
   iamRoleARN = awssetup.setup_iamrole()
-  _save_project_blueprint('iam:arn', iamRoleARN)
-  _save_project_blueprint('iam:name', _appconfig['app:name']+'-uxy-app')
-
   lambdaARN = _create_lambda(awssetup, iamRoleARN)
-
-  _save_project_blueprint('lambda:arn', lambdaARN)
-  _save_project_blueprint('lambda:name', _appconfig['app:name']+'-uxy-app-'+_appconfig['app:stage'])
-
   restApi = awssetup.setup_uxy_api(lambdaARN)
-  _save_project_blueprint('restApi:id', restApi['restApiId'])
-  _save_project_blueprint('restApi:invokeURL', restApi['invokeURL'])
-
-  _save_project_blueprint('s3:name', _appconfig['app:name']+'-uxy-app-'+_appconfig['app:stage'])
-
-  print('Saving file checksums...')
-  changeControl = ChangeControl(_appconfig['app:name'], _appconfig)
+  changeControl = ChangeControl(appName, config)
   checksums = changeControl.generate_filechecksums()
-  _save_project_blueprint('checksums', checksums)
-  awssetup.save_cloud_config(_projectBlueprint)
+  
+  projectBlueprint = {
+    'app:name' : appName,
+    'app:region' : region,
+    'app:description' : config['app:description'],
+    'iam:roles' : config['aws:config']['iam:roles'],
+    'chatbot:menu' : config['chatbot:config']['persistent_menu'],
+    'chatbot:url_whitelist' : config['chatbot:config']['URLsToWhiteList'],
+    'deployment:count' : 0,
+    'dynamodb:name' : dynamodbName,
+    'iam:arn' : iamRoleARN,
+    'iam:name' : appName + 'uxy-app',
+    'restApi:id' : restApi['restApiId'],
+    'restApi:invokeURL' : restApi['invokeURL'],
+    's3:name' : appName + '-uxy-app-' + stage,
+    'checksums' : checksums
+  }
 
+  awssetup.save_cloud_config(projectBlueprint)
   return restApi
 
-def _setup_(appname, runtime, description, stage, region):
+def setup_new_stage(config, stage):
+  """
+  Setup New AWS Stage
+  :param config: 
+  """
+
+  _project_setup(config)
+  apigateway = _aws_setup(config, stage)
+
+  if( not apigateway ):
+    print('Project Setup Aborted..')
+    return
+
+def setup(appname, runtime, description, stage, region):
   """
   Setup AWS Resources needed
   :param appname: application name
@@ -135,41 +131,33 @@ def _setup_(appname, runtime, description, stage, region):
   :param stage: app stage, this also serves as the deployment env.
   :type stage: string
   :param region: aws region
-  :type regtion: string
+  :type region: string
   """
 
-  global _appconfig
-  _appconfig = json.loads(open(uxy_cli.ROOT_DIR+'/project_template/uxy.json').read())
+  appconfig = json.loads(open(uxy_cli.ROOT_DIR+'/project_template/uxy.json').read())
+  appconfig['app:name'] = appname
+  appconfig['app:version'] = '1'
+  appconfig['app:description'] = description
+  appconfig['app:runtime'] = runtime
+  appconfig['app:stage'] = stage
+  appconfig['aws:config']['region'] = region
+  
+  _project_setup(appconfig)
+  apigateway = _aws_setup(appconfig, region)
 
-  print('\nCreating project: '+appname+'...')
-
-  _appconfig['app:name'] = appname
-  _appconfig['app:version'] = '1'
-  _appconfig['app:description'] = description
-  _appconfig['app:runtime'] = runtime
-  _appconfig['app:stage'] = stage
-  _appconfig['aws:config']['region'] = region
-
-  _save_project_blueprint('app:name', appname)
-  _save_project_blueprint('app:region', region)
-  _save_project_blueprint('app:description', _appconfig['app:description'])
-  _save_project_blueprint('iam:roles', _appconfig['aws:config']['iam:roles'])
-  _save_project_blueprint('chatbot:menu',\
-     _appconfig['chatbot:config']['persistent_menu'])
-  _save_project_blueprint('chatbot:url_whitelist',\
-     _appconfig['chatbot:config']['URLsToWhiteList'])
-  _save_project_blueprint('deployment:count',0)
-
-  _project_setup()
-  apigateway = _aws_setup()
   if( not apigateway ):
-    print('Project setup aborted.')
+    print('Project Setup Aborted..')
     return
 
   print('==> Project successfully created!')
   print('API Invocation URL: '+apigateway['invokeURL'])
   print('Use this url to integrate with a facebook app.')
   print('Deploy project with: uxy deploy --[stage]')
+  
+    
+
+
+ 
 
 
 

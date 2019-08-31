@@ -158,7 +158,7 @@ def load_config_json(deploymentStage):
 
   deploymentStage = deploymentStage and deploymentStage or config['app:stage']
   if( not _validate_appconfig(config, deploymentStage)):
-    raise Exception(e)
+    raise Exception("App config invalid")
 
   return config, deploymentStage
 

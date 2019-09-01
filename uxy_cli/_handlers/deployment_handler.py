@@ -288,9 +288,13 @@ def assess_deployment_stage(awssetup, config, stage):
 
   if( not awssetup.s3_bucket_exists(bucketName) ):
     create_deployment_stage(stage, awssetup, config)
+    return True
   elif( not awssetup.s3_object_exists(bucketName, 'aws_blueprint.json') ):
     print('Creating deployment stage')
     create_deployment_stage(stage, awssetup, config)
+    return True
+
+  return False
   
 
 def deploy(deploymentStage):
@@ -309,6 +313,7 @@ def deploy(deploymentStage):
   # Validate App Config
   try:
     config, deploymentStage = load_config_json(deploymentStage)
+    print("Deploying on "+deploymentStage)
     _file_replacements(deploymentStage, config)
     environment = load_env_vars()
     awssetup = AWSSetup(config)

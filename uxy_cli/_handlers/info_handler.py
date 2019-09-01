@@ -68,6 +68,7 @@ def get_cloud_blueprint(deploymentStage):
   config['app:stage'] = deploymentStage
   awssetup = AWSSetup(config)
   cloudBlueprint = awssetup.load_cloud_config()
+  print('Stage: '+config['app:stage'])
   print('Deployment Count: '+str(cloudBlueprint['deployment:count']))
   print('FB Verify Token: '+str(config['fb:verifyToken']))
   print('IAM ARN: '+cloudBlueprint['iam:arn'])

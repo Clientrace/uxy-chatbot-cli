@@ -47,13 +47,14 @@ def setup(component, deploymentStage):
       deploymentStage)
 
     environment = config_handler.load_env_vars(os.getcwd())
-    fbBotSetup = FBBotSetup(environment,\
-      environment.get('FACEBOOK', 'FB_PAGE_TOKEN'))
+    fbBotSetup = FBBotSetup(environment.get('FACEBOOK','FB_PAGE_TOKEN'),\
+      config)
 
-    setup_bot(config, environment, compile, fbBotSetup)
+    setup_bot(config, environment, component, fbBotSetup)
 
   except Exception as e:
-    raise("==> Setup cancelled.")
+    print("==> Setup cancelled.")
+    return
 
 
 

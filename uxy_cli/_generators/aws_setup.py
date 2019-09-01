@@ -826,8 +826,11 @@ class AWSSetup:
         print('No application logs yet.')
         return
 
-    return resp['logStreams'][0]['logStreamName']
+    if( len(resp['logStreams']) <= 0 ):
+      print('No application logs yet.')
+      return
 
+    return resp['logStreams'][0]['logStreamName']
 
   @staticmethod
   def _get_log_stream(groupname, _logs):

@@ -99,7 +99,11 @@ def botsetup(component, stage):
 
 
 # TODO: Uxy Chatbot Component generator
+@cli.command('generate')
 def generate_component():
+  """
+  Generates component
+  """
   pass
 
 if __name__ == '__main__':

@@ -22,7 +22,7 @@ def checkout(stage):
       os.getcwd(),
       stage
     )
-    print('Checking out to '+stage+'stage')
+    print('Checking out to '+stage+' stage')
     shutil.copyfile('uxy.json', '.tmp/uxy.json')
     config['app:stage'] = stage
     configJsonFile = open('uxy.json','w')

@@ -255,9 +255,9 @@ def deploy(deploymentStage):
     environment = config_handler.load_env_vars(os.getcwd())
     awssetup = AWSSetup(config)
 
+    rewrite_stage(config, deploymentStage)
     if( deploymentStage != 'dev' ):
       # Check if s3 bucket exists
-      rewrite_stage(config, deploymentStage)
       assess_deployment_stage(awssetup, config, deploymentStage)
 
     cloudBlueprint, newChecksums = setup_fb_bot(environment, awssetup, config)

@@ -113,25 +113,6 @@ def _file_replacements(stage, config):
 
   return True
 
-def load_env_vars():
-  """
-  Load environment variables
-  """
-  environment = configparser.ConfigParser()
-  try:
-    environment.read_file(open('src/env/environment.cfg'))
-  except Exception as e:
-    print('Failed to load environment configuration file')
-    raise Exception(str(e))
-
-  if( environment.get('FACEBOOK','FB_PAGE_TOKEN') == '' ):
-    print('Facebook Page Token hasn\'t been set.')
-    print('Configure the facebook page token in src/env/environment.cfg')
-    raise Exception('Empty facebook page token')
-
-  return environment
-
-
 def setup_fb_bot(environment, awssetup, config):
   """
   Setup facebook chatbot
@@ -273,7 +254,7 @@ def deploy(deploymentStage):
 
     print("Deploying on "+deploymentStage)
     _file_replacements(deploymentStage, config)
-    environment = load_env_vars()
+    environment = config_handler.load_env_vars(os.getcwd())
     awssetup = AWSSetup(config)
 
     if( deploymentStage != 'dev' ):
@@ -295,3 +276,5 @@ def deploy(deploymentStage):
   awssetup.save_cloud_config(cloudBlueprint)
 
   
+
+

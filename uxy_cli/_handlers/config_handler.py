@@ -8,6 +8,7 @@ Configuration Handler
 
 import os
 import json
+import configparser
 from uxy_cli._validators.appconfig_validator import AppConfigValidator
 
 def _validate_appconfig(config, deploymentStage):
@@ -55,6 +56,26 @@ def _load_config_json(deploymentStage, projPath):
     raise Exception("App config invalid")
 
   return config, deploymentStage
+
+def load_env_vars(projPath):
+  """
+  Load environment variables
+  :param projPath: project path
+  :type projPath: string
+  """
+  environment = configparser.ConfigParser()
+  try:
+    environment.read_file(open(projPath+'/src/env/environment.cfg'))
+  except Exception as e:
+    print('Failed to load environment configuration file')
+    raise Exception(str(e))
+
+  if( environment.get('FACEBOOK','FB_PAGE_TOKEN') == '' ):
+    print('Facebook Page Token hasn\'t been set.')
+    print('Configure the facebook page token in src/env/environment.cfg')
+    raise Exception('Empty facebook page token')
+
+  return environment
 
 def get_config(projPath, deploymentStage):
   """

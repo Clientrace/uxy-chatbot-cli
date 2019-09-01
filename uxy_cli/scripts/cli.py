@@ -94,20 +94,13 @@ def botsetup():
   pass
 
 
-
-
-
 # TODO: Uxy Chatbot Component generator
 def generate_component():
   pass
 
-
 if __name__ == '__main__':
   # TODO: Detect if awscli is installed and configured
   cli()
-
-
-
 
 
 

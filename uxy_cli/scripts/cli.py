@@ -17,6 +17,7 @@ from uxy_cli._handlers import cleanup_handler
 from uxy_cli._handlers import deployment_handler
 from uxy_cli._handlers import applogs_handler
 from uxy_cli._handlers import info_handler
+from uxy_cli._handlers import botsetup_handler
 
 @click.group()
 def cli():
@@ -88,10 +89,13 @@ def logs():
 
 
 @cli.command('botsetup')
-def botsetup():
+@click.option('-c','--component', help='Facebook bot setup', type=click.Choice(['start','menu','desc','whitelist']))
+@click.option('-s','--stage')
+def botsetup(component, stage):
   """
+  Bot setup setting
   """
-  pass
+  botsetup_handler.setup(component, stage)
 
 
 # TODO: Uxy Chatbot Component generator
@@ -101,6 +105,5 @@ def generate_component():
 if __name__ == '__main__':
   # TODO: Detect if awscli is installed and configured
   cli()
-
 
 

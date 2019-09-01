@@ -58,8 +58,6 @@ def _check_app_updates(config, cloudBlueprint, environment):
 
   return newChecksums, changeStatus
 
-
-# TODO: Chatbot setup
 def _chatbot_setup(config, environment, element, fbBotSetup):
   """
   Setup chatbot settings
@@ -276,5 +274,4 @@ def deploy(deploymentStage):
   awssetup.save_cloud_config(cloudBlueprint)
 
   
-
 

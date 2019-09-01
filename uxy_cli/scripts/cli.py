@@ -18,6 +18,7 @@ from uxy_cli._handlers import deployment_handler
 from uxy_cli._handlers import applogs_handler
 from uxy_cli._handlers import info_handler
 from uxy_cli._handlers import botsetup_handler
+from uxy_cli._handlers import stage_handler
 
 @click.group()
 def cli():
@@ -35,7 +36,8 @@ def cli():
 @click.option('-r','--runtime', default='python', help='application runtime', type=click.Choice(['python','go']))
 def new(appname, runtime):
   """
-  Creates new project.
+  Creates new uxy chatbot project. Generates AWS 
+  infra/resources (Lambda, DynamoDB, API Gateway, Cloudwatch, S3, IAM Role)
   """
 
   if( os.path.exists(appname)):
@@ -98,6 +100,15 @@ def botsetup(component, stage):
   botsetup_handler.setup(component, stage)
 
 
+@cli.command('checkout')
+@click.option('-s','--stage', required=True)
+def checkout(stage):
+  """
+  Checkout to a stage
+  """
+  stage_handler.checkout(stage)
+
+
 # TODO: Uxy Chatbot Component generator
 @cli.command('generate')
 def generate_component():
@@ -105,6 +116,13 @@ def generate_component():
   Generates component
   """
   pass
+
+
+# TODO: Version
+@cli.command('version')
+def version():
+  print('uxy-cli : v.0.0.2')
+
 
 if __name__ == '__main__':
   # TODO: Detect if awscli is installed and configured

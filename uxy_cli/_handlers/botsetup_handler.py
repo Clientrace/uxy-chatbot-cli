@@ -1,6 +1,6 @@
 """
 Authored by Kim Clarence Penaflor
-01/01//2019
+08/31//2019
 version 0.0.1
 Documented via reST
 
@@ -37,6 +37,12 @@ def setup_bot(config, environment, element, fbBotSetup):
       fbBotSetup.init_persistent_menu()
 
 def setup(component, deploymentStage):
+  """
+  Apply chatbot setup
+  :param component: component to update
+  :type component: string
+  """
+
   if( not os.path.isfile('uxy.json') ):
     print('Failed to locate app configuration file.')
     print('==> Deployment cancelled.')

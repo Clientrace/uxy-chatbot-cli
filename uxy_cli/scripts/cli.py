@@ -87,6 +87,15 @@ def logs():
   applogs_handler.getlogs()
 
 
+@cli.command('botsetup')
+def botsetup():
+  """
+  """
+  pass
+
+
+
+
 
 # TODO: Uxy Chatbot Component generator
 def generate_component():

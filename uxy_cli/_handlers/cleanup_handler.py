@@ -11,6 +11,7 @@ import json
 import os
 import shutil
 from uxy_cli._generators.aws_setup import AWSSetup
+from uxy_cli._handlers import config_handler
 
 
 def __remove_dynamodb(awssetup, cloudBlueprint):
@@ -104,7 +105,7 @@ def purge():
     print('Failed to locate app configuration file..')
     return 
 
-  appConfig = json.loads(open('uxy.json').read())
+  appConfig, deploymentStage = config_handler.get_config(os.getcwd(), None)
   awssetup = AWSSetup(appConfig)
 
   print('Loading application cloud blueprint...')

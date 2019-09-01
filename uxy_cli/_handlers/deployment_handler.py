@@ -14,9 +14,9 @@ import hashlib
 import shutil
 from uxy_cli._handlers.change_control import ChangeControl
 from uxy_cli._handlers.fb_bot_setup import FBBotSetup
-from uxy_cli._validators.appconfig_validator import AppConfigValidator
 from uxy_cli._generators.aws_setup import AWSSetup
 from uxy_cli._handlers import setup_handler
+from uxy_cli._handlers import config_handler
 
 def compile_spiels(path):
   """
@@ -112,56 +112,6 @@ def _file_replacements(stage, config):
     oldFile.close()
 
   return True
-
-def _validate_appconfig(config, deploymentStage):
-  """
-  Validate app configuration file
-  :param config: application configuration
-  :type config: dictionary
-  :param deploymentStage: application deployment stage
-  :type deploymentStage: string
-  :returns: app config validility
-  :rtype: boolean
-  """
-  appconfigValidator = AppConfigValidator(config)
-  if( not appconfigValidator.attrib_check() ):
-    print('App configuration is invalid. Missing some key parameters')
-    print('==> Deployment cancelled.')
-    return False
-
-  if( not appconfigValidator.rule_validation_check() ):
-    print('App configuration is invalid.')
-    print('==> Deployment cancelled.')
-    return False
-
-  # Check deployment stage environment replacements
-  if( deploymentStage not in config['app:config'] ):
-    print('Deployment stage: '+deploymentStage\
-      +' not in app configuration (uxy.json) app:config')
-    print('==> Deployment cancelled.')
-    return False
-
-  return True
-
-
-def load_config_json(deploymentStage):
-  """
-  Load configuration json file (uxy.json)
-  :param deploymentStage: application deployment stage
-  :type deploymentStage: string
-  """
-  try:
-    config = json.loads(open('uxy.json').read())
-  except Exception as e:
-    print('App Configuration is not valid json format.')
-    raise Exception(e)
-
-  deploymentStage = deploymentStage and deploymentStage or config['app:stage']
-  if( not _validate_appconfig(config, deploymentStage)):
-    raise Exception("App config invalid")
-
-  return config, deploymentStage
-
 
 def load_env_vars():
   """
@@ -275,17 +225,15 @@ def create_deployment_stage(stage, awssetup, config):
 def assess_deployment_stage(awssetup, config, stage):
   """
   Assess deployment stage if everything is already setup up before
+  :param awssetup: Aws Setup Manager
+  :type awssetup: AWSSetup Object
+  :param config: app configuraoitn
+  :type config: dictionary
+  :param stage: app deployment stage
+  :type stage: string
   """
 
-  # Create app configuration backup
-  shutil.copyfile('uxy.json', '.tmp/uxy.json')
-
   bucketName = config['app:name'] + '-uxy-app-' + stage
-  config['app:stage'] = stage
-  configJsonFile = open('uxy.json','w')
-  configJsonFile.write(json.dumps(config, indent=2))
-  configJsonFile.close()
-
   if( not awssetup.s3_bucket_exists(bucketName) ):
     create_deployment_stage(stage, awssetup, config)
     return True
@@ -295,6 +243,20 @@ def assess_deployment_stage(awssetup, config, stage):
     return True
 
   return False
+
+def rewrite_stage(config, stage):
+  """
+  Rewrite Stage
+  :param config: app configuration
+  :type config: string
+  :param stage: app deployment stage
+  :type stage: string
+  """
+  shutil.copyfile('uxy.json', '.tmp/uxy.json')
+  config['app:stage'] = stage
+  configJsonFile = open('uxy.json','w')
+  configJsonFile.write(json.dumps(config, indent=2))
+  configJsonFile.close()
   
 
 def deploy(deploymentStage):
@@ -304,15 +266,11 @@ def deploy(deploymentStage):
   :type deploymentStage: string
   """
 
-  # Look for app configuration file
-  if( not os.path.isfile('uxy.json') ):
-    print('Failed to locate app configuration file.')
-    print('==> Deployment cancelled.')
-    return
-
   # Validate App Config
   try:
-    config, deploymentStage = load_config_json(deploymentStage)
+    config, deploymentStage = config_handler.get_config(os.getcwd(),\
+       deploymentStage)
+
     print("Deploying on "+deploymentStage)
     _file_replacements(deploymentStage, config)
     environment = load_env_vars()
@@ -320,6 +278,7 @@ def deploy(deploymentStage):
 
     if( deploymentStage != 'dev' ):
       # Check if s3 bucket exists
+      rewrite_stage(config, deploymentStage)
       assess_deployment_stage(awssetup, config, deploymentStage)
 
     cloudBlueprint, newChecksums = setup_fb_bot(environment, awssetup, config)
@@ -336,4 +295,3 @@ def deploy(deploymentStage):
   awssetup.save_cloud_config(cloudBlueprint)
 
   
-

@@ -168,39 +168,7 @@
           }
         }
       },
-      "call_to_actions" : [{
-        "type" : {
-          "_rule" : {
-            "type" : "string",
-            "value" : {
-              "set" : "predefined",
-              "type" : "any",
-              "lists" : [
-                "postback",
-                "web_url"
-              ]
-            }
-          }
-        },
-        "title" : {
-          "_rule" : {
-            "type" : "string",
-            "value" : {
-              "set" : "custom",
-              "type" : "any"
-            }
-          }
-        },
-        "payload" : {
-          "_rule" : {
-            "type" : "string",
-            "value" : {
-              "set" : "custom",
-              "type" : "any"
-            }
-          }
-        }
-      }]
+      "call_to_actions" : []
     }
   },
   "verbosity": {

@@ -117,7 +117,7 @@ def setup_fb_bot(environment, awssetup, config):
   """
   fbBotSetup = FBBotSetup(environment.get('FACEBOOK', 'FB_PAGE_TOKEN'), config)
   if( not fbBotSetup.check_token_validity() ):
-    raise Exception('s3 bucket name not available.')
+    raise Exception('FB Token not valid.')
 
   cloudBlueprint = awssetup.load_cloud_config()
 

@@ -47,7 +47,9 @@ class FBBotSetup:
     persistConfig = self.config['chatbot:config']['persistent_menu']
     resp = requests.post(
       URL,
-      json = persistConfig
+      json = {
+        'persistent_menu' : [persistConfig]
+      }
     )
     if( resp.status_code != 200 ):
       FBBotSetup._log("Setup Failed.")

@@ -168,7 +168,7 @@
           }
         }
       },
-      "call_to_actions" : []
+      "call_to_actions" : [{}]
     }
   },
   "verbosity": {

@@ -9,6 +9,12 @@ data storing, s3 bucket for resource blueprint and assets storage, and api gatew
 that you need to integrate with your Facebook application. I'm also planning to add other messaging channel
 like telegram, viber, twitter in the future. Have fun.
 
+###
+Installation:	
+```
+pip3 install .
+```
+
 #### Project Package Structure
 ```
 |── _uxy_core

@@ -8,12 +8,12 @@ setup(
   packages = find_packages(),
   include_package_data=True,
   install_requires = requirements,
+  package_data={'':['*.json']},
   entry_points = '''
   [console_scripts]
   uxy=uxy_cli.scripts.cli:cli
   '''
 )
-
 
 
 

@@ -132,6 +132,7 @@ class AWSSetup:
         }
       )
     except Exception as e:
+      AWSSetup._log(e)
       if( '(OperationAborted)' in str(e) ):
         AWSSetup._log('Bucket name in on queue for deletion.')
         status = False

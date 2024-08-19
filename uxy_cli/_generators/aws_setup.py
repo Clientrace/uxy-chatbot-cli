@@ -449,9 +449,10 @@ class AWSSetup:
       if( config['app:runtime'] == 'go' ):
         runtime = 'go1.x'
       if( config['app:runtime'] == 'python' ):
-        runtime = 'python3.6'
+        runtime = 'python3.9'
 
       AWSSetup._log("+ Creating lambda function...")
+      AWSSetup._log("+ Runtime: "+runtime)
       response = _lambda.create_function(
         FunctionName = funcName,
         Runtime = runtime,

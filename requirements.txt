@@ -8,7 +8,7 @@ ddt==1.2.1
 docutils==0.14
 gitdb==0.6.4
 gitdb2==2.0.5
-GitPython==3.0.0
+GitPython==3.1.41
 idna==2.8
 isort==4.3.21
 jmespath==0.9.4
